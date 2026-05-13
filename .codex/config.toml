@@ -1,0 +1,9 @@
+# Codex project configuration placeholder.
+# Add project-specific agent preferences here as the app takes shape.
+
+[project]
+name = "cabinet-shop-platform"
+description = "Cabinet shop operating system for project workflow, production tracking, and closeout."
+
+model = "gpt-5.5"
+approval_policy = "on-request"
