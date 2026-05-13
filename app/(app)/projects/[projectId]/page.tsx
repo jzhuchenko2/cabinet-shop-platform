@@ -1,5 +1,7 @@
 import { ProjectDetail } from "@/components/projects/project-detail";
 
-export default function ProjectDetailPage({ params }: { params: { projectId: string } }) {
+export const dynamic = "force-dynamic";
+
+export default async function ProjectDetailPage({ params }: { params: { projectId: string } }) {
   return <ProjectDetail projectId={params.projectId} />;
 }

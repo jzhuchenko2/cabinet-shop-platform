@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/ui/page-header";
 import { NewProjectForm } from "@/components/projects/new-project-form";
+import { createProjectAction } from "./actions";
 
 export default function NewProjectPage() {
   return (
@@ -9,7 +10,7 @@ export default function NewProjectPage() {
         title="New project"
         description="Capture the job basics before areas, cabinet items, tasks, files, and time logs are added."
       />
-      <NewProjectForm />
+      <NewProjectForm action={createProjectAction} />
     </>
   );
 }

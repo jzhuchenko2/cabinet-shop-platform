@@ -36,7 +36,15 @@ Then open the local development URL printed by Next.js.
 
 ## Database Setup
 
-Copy `.env.example` to `.env`, set `DATABASE_URL` to a PostgreSQL database, then run:
+Copy `.env.example` to `.env`. For local Docker-based development, start the included Postgres service first:
+
+```bash
+docker compose up -d
+```
+
+The default local `DATABASE_URL` uses port `5433` so it does not conflict with an existing PostgreSQL install on `5432`.
+
+Then run:
 
 ```bash
 npm run prisma:generate
@@ -45,3 +53,7 @@ npm run prisma:seed
 ```
 
 The seed creates one sample organization, the default cabinet-shop departments, users, a client, a project, areas, cabinet items, tasks, notes, files/photos metadata, notifications, and time logs.
+
+## Current MVP Persistence
+
+Project creation, project list, and project detail pages are wired to Prisma/PostgreSQL. Configure `DATABASE_URL`, run the Prisma setup commands above, and seed the database before using the project flow locally.
