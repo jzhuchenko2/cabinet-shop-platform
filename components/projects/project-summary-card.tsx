@@ -12,16 +12,18 @@ export type ProjectSummary = {
 export function ProjectSummaryCard({ project }: { project: ProjectSummary }) {
   return (
     <article className="card">
-      <h3>
-        <Link href={`/projects/${project.id}`}>{project.name}</Link>
-      </h3>
+      <h3>{project.name}</h3>
       <p className="muted">{project.client}</p>
       <p>{project.department}</p>
       <p className="muted">Due {project.dueDate}</p>
-      <span className={project.status === "Blocked" ? "status-pill blocked" : "status-pill ready"}>
-        {project.status}
-      </span>
+      <div className="grid">
+        <span className={project.status === "Blocked" ? "status-pill blocked" : "status-pill ready"}>
+          {project.status}
+        </span>
+        <Link className="button secondary block" href={`/projects/${project.id}`}>
+          Open project
+        </Link>
+      </div>
     </article>
   );
 }
-

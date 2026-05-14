@@ -135,6 +135,7 @@ Recommended future data model additions:
 - Tasks can be assigned to a user.
 - Tasks track title, description, status, priority, due date, completion date, blocked state, and blocked reason.
 - Task statuses are TODO, READY, IN_PROGRESS, BLOCKED, DONE, and CANCELED.
+- Current MVP behavior: project tasks are listed from PostgreSQL, users can add basic tasks from the project tasks page, and task statuses can be updated from the task table.
 
 ### Department Board
 
@@ -192,7 +193,8 @@ Organizations are the tenant boundary for the SaaS product. Departments are conf
 - The project creation form uses a server action and Prisma-backed persistence.
 - Project list and project detail pages read from PostgreSQL through Prisma.
 - The project areas page reads areas/cabinet items from PostgreSQL and supports basic creation.
-- Static sample data is still used for most dashboard, task, client, department, file, photo, notification, and time-log subviews.
+- The project tasks page reads tasks from PostgreSQL and supports basic task creation and status updates.
+- Static sample data is still used for most dashboard, client, department detail, file, photo, notification, and time-log subviews.
 - Prisma schema and seed data are available for the backend persistence layer.
 
 ## Acceptance Criteria For The First Vertical Slice
@@ -210,15 +212,16 @@ Organizations are the tenant boundary for the SaaS product. Departments are conf
 
 1. Add real Supabase Auth sign-in and session handling.
 2. Expand area and cabinet item editing beyond basic creation.
-3. Add CRUD flows for tasks, notes, files/photos, and time logs.
-4. Add department board filtering and blocker/due-date views.
-5. Add Supabase Storage upload handling.
-6. Add notification creation for key workflow events.
-7. Add role-based access controls.
-8. Add customizable department positions and scoped permissions.
-9. Add admin settings screens for users, departments, positions, and permissions.
-10. Add a pricing/cost visibility permission separate from general project visibility.
-11. Add audit logging for permission, position, user, and destructive record changes.
+3. Expand task editing beyond creation/status updates.
+4. Add CRUD flows for notes, files/photos, and time logs.
+5. Add department board filtering and blocker/due-date views.
+6. Add Supabase Storage upload handling.
+7. Add notification creation for key workflow events.
+8. Add role-based access controls.
+9. Add customizable department positions and scoped permissions.
+10. Add admin settings screens for users, departments, positions, and permissions.
+11. Add a pricing/cost visibility permission separate from general project visibility.
+12. Add audit logging for permission, position, user, and destructive record changes.
 
 ## Permissions Module To-Dos
 

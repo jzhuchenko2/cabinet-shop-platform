@@ -1,3 +1,5 @@
+import { prisma } from "@/lib/prisma";
+
 export type AppRole =
   | "OWNER_ADMIN"
   | "MANAGER"
@@ -17,6 +19,20 @@ export type CurrentUser = {
 };
 
 export async function getCurrentUser(): Promise<CurrentUser | null> {
+  const user = await prisma.user.findUnique({
+    where: { email: "admin@example.com" }
+  });
+
+  if (user) {
+    return {
+      id: user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      organizationId: user.organizationId
+    };
+  }
+
   return {
     id: "seed-user-owner",
     name: "MVP Admin",
@@ -25,4 +41,3 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
     organizationId: "seed-organization"
   };
 }
-
