@@ -27,7 +27,9 @@ export default function ClientsPage() {
           {clients.map((client) => (
             <tr key={client.id}>
               <td>
-                <Link href={`/clients/${client.id}`}>{client.name}</Link>
+                <Link className="button secondary" href={`/clients/${client.id}`}>
+                  {client.name}
+                </Link>
               </td>
               <td>{client.contact}</td>
               <td>{client.projects}</td>
@@ -38,4 +40,3 @@ export default function ClientsPage() {
     </>
   );
 }
-

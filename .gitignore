@@ -1,5 +1,6 @@
 node_modules/
 .next/
+.next-local/
 out/
 dist/
 coverage/
@@ -7,4 +8,3 @@ coverage/
 .env.local
 .env.*.local
 *.log
-

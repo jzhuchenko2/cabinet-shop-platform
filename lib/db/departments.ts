@@ -21,6 +21,13 @@ export function listDepartments(organizationId: string) {
   });
 }
 
+export function listDepartmentOptions(organizationId: string) {
+  return prisma.department.findMany({
+    where: { organizationId },
+    orderBy: { sortOrder: "asc" }
+  });
+}
+
 export function getDepartment(departmentId: string) {
   return prisma.department.findUnique({
     where: { id: departmentId },
@@ -40,4 +47,3 @@ export function getDepartment(departmentId: string) {
     }
   });
 }
-

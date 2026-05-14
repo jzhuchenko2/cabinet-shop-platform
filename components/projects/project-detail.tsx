@@ -76,11 +76,22 @@ export async function ProjectDetail({ projectId }: { projectId: string }) {
       <section className="grid grid-2" style={{ marginTop: 16 }}>
         <div className="card">
           <h2>Project links</h2>
-          <div className="stage-list">
-            <Link href={`/projects/${projectId}/areas`}>Areas and cabinet items</Link>
-            <Link href={`/projects/${projectId}/files`}>Files and approvals</Link>
-            <Link href={`/projects/${projectId}/photos`}>Photos</Link>
-            <Link href={`/projects/${projectId}/time`}>Time logs</Link>
+          <div className="action-list">
+            <Link className="button secondary block" href={`/projects/${projectId}/areas`}>
+              Areas and cabinet items
+            </Link>
+            <Link className="button secondary block" href={`/projects/${projectId}/tasks`}>
+              Tasks
+            </Link>
+            <Link className="button secondary block" href={`/projects/${projectId}/files`}>
+              Files and approvals
+            </Link>
+            <Link className="button secondary block" href={`/projects/${projectId}/photos`}>
+              Photos
+            </Link>
+            <Link className="button secondary block" href={`/projects/${projectId}/time`}>
+              Time logs
+            </Link>
           </div>
         </div>
         <div>

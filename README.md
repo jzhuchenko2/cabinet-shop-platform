@@ -56,4 +56,4 @@ The seed creates one sample organization, the default cabinet-shop departments, 
 
 ## Current MVP Persistence
 
-Project creation, project list, and project detail pages are wired to Prisma/PostgreSQL. Configure `DATABASE_URL`, run the Prisma setup commands above, and seed the database before using the project flow locally.
+Project creation, project list, project detail, project areas/cabinet items, and project tasks are wired to Prisma/PostgreSQL. Configure `DATABASE_URL`, run the Prisma setup commands above, and seed the database before using the project flow locally.
