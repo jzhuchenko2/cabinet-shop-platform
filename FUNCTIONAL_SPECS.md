@@ -113,7 +113,7 @@ Recommended future data model additions:
 - A new project should appear on the project list after creation.
 - Opening a project shows client, current stage, project links, basic metrics, and recent notes.
 - Production persistence target: projects are stored in PostgreSQL through Prisma.
-- Current local MVP behavior: new projects are saved in browser local storage so the UI works before database setup.
+- Current MVP behavior: new projects are saved to PostgreSQL through Prisma and appear on the project list/detail pages.
 
 ### Clients
 
@@ -126,6 +126,7 @@ Recommended future data model additions:
 - Projects can be broken into areas or rooms, such as kitchen, island, pantry, mudroom, or vanity.
 - Areas can contain cabinet items.
 - Cabinet items can track item number, type, quantity, dimensions, material, finish, hardware, and status.
+- Current MVP behavior: project areas and cabinet items are listed from PostgreSQL, and users can add basic areas and cabinet items from the project areas page.
 
 ### Tasks
 
@@ -188,35 +189,36 @@ Organizations are the tenant boundary for the SaaS product. Departments are conf
 ## Current Local MVP Behavior
 
 - The app is scaffolded with Next.js, TypeScript, Prisma, and Supabase client setup.
-- The project creation form works locally without a database by storing new projects in browser local storage.
-- Static sample data is still used for most dashboard, task, client, department, file, photo, notification, and time-log views.
+- The project creation form uses a server action and Prisma-backed persistence.
+- Project list and project detail pages read from PostgreSQL through Prisma.
+- The project areas page reads areas/cabinet items from PostgreSQL and supports basic creation.
+- Static sample data is still used for most dashboard, task, client, department, file, photo, notification, and time-log subviews.
 - Prisma schema and seed data are available for the backend persistence layer.
 
 ## Acceptance Criteria For The First Vertical Slice
 
 - A user can open the dashboard.
-- A user can create a new project from `/projects/new`.
+- A user can create a new Prisma-backed project from `/projects/new`.
 - The created project redirects to its project detail page.
 - The created project appears on `/projects`.
 - The project detail page links to areas, tasks, files, photos, and time logs.
-- Prisma schema validates successfully.
+- Prisma schema validates successfully when `DATABASE_URL` is configured.
 - Production build completes successfully.
 - Seed data can create one sample shop, departments, users, client, project, areas, cabinet items, tasks, notes, files/photos metadata, notifications, and time logs.
 
 ## Future Implementation Priorities
 
-1. Replace local-storage project creation with Prisma-backed server persistence.
-2. Add real Supabase Auth sign-in and session handling.
-3. Connect project list/detail pages to the database.
-4. Add CRUD flows for areas, cabinet items, tasks, notes, files/photos, and time logs.
-5. Add department board filtering and blocker/due-date views.
-6. Add Supabase Storage upload handling.
-7. Add notification creation for key workflow events.
-8. Add role-based access controls.
-9. Add customizable department positions and scoped permissions.
-10. Add admin settings screens for users, departments, positions, and permissions.
-11. Add a pricing/cost visibility permission separate from general project visibility.
-12. Add audit logging for permission, position, user, and destructive record changes.
+1. Add real Supabase Auth sign-in and session handling.
+2. Expand area and cabinet item editing beyond basic creation.
+3. Add CRUD flows for tasks, notes, files/photos, and time logs.
+4. Add department board filtering and blocker/due-date views.
+5. Add Supabase Storage upload handling.
+6. Add notification creation for key workflow events.
+7. Add role-based access controls.
+8. Add customizable department positions and scoped permissions.
+9. Add admin settings screens for users, departments, positions, and permissions.
+10. Add a pricing/cost visibility permission separate from general project visibility.
+11. Add audit logging for permission, position, user, and destructive record changes.
 
 ## Permissions Module To-Dos
 

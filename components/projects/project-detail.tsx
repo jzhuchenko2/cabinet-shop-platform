@@ -1,39 +1,67 @@
-"use client";
-
-import { useEffect, useState } from "react";
 import Link from "next/link";
 import { NoteList } from "@/components/notes/note-list";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
-import { demoProjectsStorageKey, sampleProjects, type StoredProject } from "@/lib/demo-projects";
+import { getProject } from "@/lib/db/projects";
 
-function loadProject(projectId: string) {
-  const rawProjects = window.localStorage.getItem(demoProjectsStorageKey);
-  const storedProjects = rawProjects ? (JSON.parse(rawProjects) as StoredProject[]) : [];
-  return storedProjects.find((project) => project.id === projectId) ?? sampleProjects.find((project) => project.id === projectId);
+function formatDate(value: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(value);
 }
 
-export function ProjectDetail({ projectId }: { projectId: string }) {
-  const [project, setProject] = useState(() => sampleProjects.find((item) => item.id === projectId));
+export async function ProjectDetail({ projectId }: { projectId: string }) {
+  const project = await getProject(projectId);
 
-  useEffect(() => {
-    try {
-      setProject(loadProject(projectId));
-    } catch {
-      setProject(sampleProjects.find((item) => item.id === projectId));
-    }
-  }, [projectId]);
+  if (!project) {
+    return (
+      <>
+        <PageHeader
+          eyebrow="Project"
+          title="Project not found"
+          description={`No project exists for ID ${projectId}.`}
+          action={
+            <Link className="button" href="/projects">
+              Back to projects
+            </Link>
+          }
+        />
+        <section className="card">
+          <p className="muted">Create this project or choose another job from the project list.</p>
+        </section>
+      </>
+    );
+  }
 
-  const title = project?.name ?? "Project not found";
-  const client = project?.client ?? "No client";
-  const department = project?.department ?? "Unknown";
+  const loggedMinutes = project.timeLogs.reduce((total, log) => total + log.minutes, 0);
+  const loggedHours = Math.round((loggedMinutes / 60) * 10) / 10;
+  const recentNotes =
+    project.notes.length > 0
+      ? project.notes.slice(0, 4).map((note) => ({
+          body: note.body,
+          author: note.author.name,
+          noteType: note.noteType,
+          createdAt: formatDate(note.createdAt)
+        }))
+      : [
+          {
+            body: "Project created and ready for setup.",
+            author: "System",
+            noteType: "GENERAL",
+            createdAt: "Today"
+          }
+        ];
 
   return (
     <>
       <PageHeader
         eyebrow="Project"
-        title={title}
-        description={`Client: ${client}. Current stage: ${department}. Project ID: ${projectId}.`}
+        title={project.name}
+        description={`Client: ${project.client.name}. Current stage: ${
+          project.currentDepartment?.name ?? "Unassigned"
+        }. Project ID: ${projectId}.`}
         action={
           <Link className="button" href={`/projects/${projectId}/tasks`}>
             View tasks
@@ -41,9 +69,9 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
         }
       />
       <section className="grid grid-3">
-        <StatCard label="Areas" value="0" detail="Add rooms and spaces next" />
-        <StatCard label="Cabinet items" value="0" detail="Base, wall, tall, trim" />
-        <StatCard label="Logged time" value="0h" detail="No time logged yet" />
+        <StatCard label="Areas" value={project._count.areas} detail="Rooms and spaces in scope" />
+        <StatCard label="Cabinet items" value={project._count.cabinetItems} detail="Base, wall, tall, trim" />
+        <StatCard label="Logged time" value={`${loggedHours}h`} detail={`${loggedMinutes} minutes logged`} />
       </section>
       <section className="grid grid-2" style={{ marginTop: 16 }}>
         <div className="card">
@@ -57,19 +85,9 @@ export function ProjectDetail({ projectId }: { projectId: string }) {
         </div>
         <div>
           <h2>Recent notes</h2>
-          <NoteList
-            notes={[
-              {
-                body: project ? "Project created and ready for setup." : "Create this project or return to the project list.",
-                author: "System",
-                noteType: "GENERAL",
-                createdAt: "Today"
-              }
-            ]}
-          />
+          <NoteList notes={recentNotes} />
         </div>
       </section>
     </>
   );
 }
-

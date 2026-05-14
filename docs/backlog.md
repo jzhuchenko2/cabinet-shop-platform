@@ -4,19 +4,21 @@
 
 1. Scaffold app - initial structure complete
 2. Auth - placeholder screen and helper in place
-3. Project model - Prisma schema in place
-4. Task model - Prisma schema in place
-5. Department board - initial page/component in place
-6. File upload - placeholder route and schema metadata in place
-7. Notifications - initial page and schema in place
-8. Time logging - initial page/component and schema in place
+3. Project model - Prisma schema and first Prisma-backed create/list/detail flow in place
+4. Areas and cabinet items - Prisma-backed list/create flow in place
+5. Task model - Prisma schema in place
+6. Department board - initial page/component in place
+7. File upload - placeholder route and schema metadata in place
+8. Notifications - initial page and schema in place
+9. Time logging - initial page/component and schema in place
 
 ## Notes
 
 The first implementation pass should focus on getting a simple vertical slice working:
 
 - Sign in
-- Create a project
+- Create a project with Prisma persistence
+- Add areas and cabinet items
 - Move the project through departments
 - Add tasks
 - Upload files
