@@ -185,6 +185,11 @@ h3 {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.project-workspace {
+  align-items: start;
+  grid-template-columns: minmax(560px, 1.35fr) minmax(360px, 0.85fr);
+}
+
 .card {
   background: var(--panel);
   border: 1px solid var(--line);
@@ -288,6 +293,7 @@ h3 {
   border-bottom: 1px solid var(--line);
   padding: 12px 8px;
   text-align: left;
+  vertical-align: middle;
 }
 
 .table th {
@@ -297,18 +303,23 @@ h3 {
 }
 
 .task-status-control {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
+  align-items: stretch;
+  display: grid;
   gap: 8px;
+  justify-items: start;
+  min-width: 150px;
 }
 
 .task-status-control select {
   background: #fffaf3;
   border: 1px solid var(--line);
   border-radius: 6px;
-  min-width: 140px;
+  min-width: 150px;
   padding: 8px 10px;
+}
+
+.task-status-control .button {
+  min-width: 92px;
 }
 
 .form {
@@ -394,5 +405,70 @@ h3 {
   .grid-2,
   .grid-3 {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 1200px) {
+  .project-workspace {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 760px) {
+  .responsive-table,
+  .responsive-table thead,
+  .responsive-table tbody,
+  .responsive-table tr,
+  .responsive-table th,
+  .responsive-table td {
+    display: block;
+    width: 100%;
+  }
+
+  .responsive-table thead {
+    display: none;
+  }
+
+  .responsive-table tr {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    margin-bottom: 12px;
+    overflow: hidden;
+  }
+
+  .responsive-table tr:last-child {
+    margin-bottom: 0;
+  }
+
+  .responsive-table td {
+    align-items: start;
+    display: grid;
+    gap: 12px;
+    grid-template-columns: 110px minmax(0, 1fr);
+    padding: 12px;
+  }
+
+  .responsive-table td::before {
+    color: var(--accent-strong);
+    content: attr(data-label);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+
+  .responsive-table td:last-child {
+    border-bottom: 0;
+  }
+
+  .task-status-control {
+    justify-items: stretch;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .task-status-control select,
+  .task-status-control .button {
+    min-width: 0;
+    width: 100%;
   }
 }

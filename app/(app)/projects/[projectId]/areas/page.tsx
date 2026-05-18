@@ -36,7 +36,7 @@ function CabinetItemsTable({
   }>;
 }) {
   return (
-    <table className="table">
+    <table className="table responsive-table cabinet-items-table">
       <thead>
         <tr>
           <th>Item</th>
@@ -49,14 +49,14 @@ function CabinetItemsTable({
       <tbody>
         {items.map((item) => (
           <tr key={item.id}>
-            <td>
+            <td data-label="Item">
               {item.itemNumber ? `${item.itemNumber} - ` : ""}
               {item.name}
             </td>
-            <td>{item.itemType.replace("_", " ")}</td>
-            <td>{item.quantity}</td>
-            <td>{formatDimensions(item)}</td>
-            <td>{item.status.replace("_", " ")}</td>
+            <td data-label="Type">{item.itemType.replace("_", " ")}</td>
+            <td data-label="Qty">{item.quantity}</td>
+            <td data-label="Dimensions">{formatDimensions(item)}</td>
+            <td data-label="Status">{item.status.replace("_", " ")}</td>
           </tr>
         ))}
       </tbody>
@@ -86,7 +86,7 @@ export default async function ProjectAreasPage({ params }: { params: { projectId
         title="Areas and cabinet items"
         description={`${project.name}: rooms, spaces, and cabinet packages in scope.`}
       />
-      <section className="grid grid-2">
+      <section className="grid project-workspace">
         <div className="grid">
           {areas.length > 0 ? (
             areas.map((area) => (

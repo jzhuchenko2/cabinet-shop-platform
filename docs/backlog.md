@@ -11,6 +11,7 @@
 7. File upload - placeholder route and schema metadata in place
 8. Notifications - initial page and schema in place
 9. Time logging - initial page/component and schema in place
+10. Project task and area views - responsive layout polish added for narrower screens
 
 ## Notes
 
