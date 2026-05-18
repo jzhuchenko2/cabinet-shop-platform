@@ -41,7 +41,7 @@ export function TaskTable({
   }
 
   return (
-    <table className="table">
+    <table className="table responsive-table task-table">
       <thead>
         <tr>
           <th>Task</th>
@@ -56,13 +56,13 @@ export function TaskTable({
       <tbody>
         {tasks.map((task) => (
           <tr key={task.id ?? `${task.title}-${task.department}-${task.dueDate}`}>
-            <td>{task.title}</td>
-            <td>{task.department}</td>
-            <td>{task.assignee}</td>
-            <td>{task.scope ?? "Project"}</td>
-            <td>{task.priority ?? "NORMAL"}</td>
-            <td>{task.dueDate}</td>
-            <td>
+            <td data-label="Task">{task.title}</td>
+            <td data-label="Department">{task.department}</td>
+            <td data-label="Assignee">{task.assignee}</td>
+            <td data-label="Scope">{task.scope ?? "Project"}</td>
+            <td data-label="Priority">{task.priority ?? "NORMAL"}</td>
+            <td data-label="Due">{task.dueDate}</td>
+            <td data-label="Status">
               {updateStatusAction && task.id ? (
                 <form action={updateStatusAction} className="task-status-control">
                   <input name="taskId" type="hidden" value={task.id} />

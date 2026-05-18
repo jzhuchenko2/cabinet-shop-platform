@@ -84,7 +84,7 @@ export default async function ProjectTasksPage({ params }: { params: { projectId
         title="Project tasks"
         description={`${project.name}: department work, assignments, blockers, and due dates.`}
       />
-      <section className="grid grid-2">
+      <section className="grid project-workspace">
         <div className="card">
           <TaskTable tasks={taskRows} updateStatusAction={updateStatusForProject} />
         </div>
