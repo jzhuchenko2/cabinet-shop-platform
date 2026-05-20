@@ -62,7 +62,8 @@ Use Supabase Postgres for the production database and add these environment vari
 DATABASE_URL="Supabase pooled/runtime connection string"
 DIRECT_URL="Supabase direct/session connection string for Prisma migrations"
 NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
-NEXT_PUBLIC_SUPABASE_ANON_KEY="your public anon key"
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY="your public publishable key"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="legacy public anon key, optional if publishable key is set"
 SUPABASE_SERVICE_ROLE_KEY="your server-only service role key"
 ```
 
