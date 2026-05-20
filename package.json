@@ -8,6 +8,7 @@
     "lint": "next lint",
     "prisma:generate": "prisma generate",
     "prisma:validate": "prisma validate",
+    "prisma:deploy": "prisma migrate deploy",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "tsx prisma/seed.ts"
   },
@@ -32,4 +33,3 @@
     "seed": "tsx prisma/seed.ts"
   }
 }
-

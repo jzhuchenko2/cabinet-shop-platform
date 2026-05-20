@@ -54,6 +54,26 @@ npm run prisma:seed
 
 The seed creates one sample organization, the default cabinet-shop departments, users, a client, a project, areas, cabinet items, tasks, notes, files/photos metadata, notifications, and time logs.
 
+## Vercel Deployment
+
+Use Supabase Postgres for the production database and add these environment variables in Vercel:
+
+```bash
+DATABASE_URL="Supabase pooled/runtime connection string"
+DIRECT_URL="Supabase direct/session connection string for Prisma migrations"
+NEXT_PUBLIC_SUPABASE_URL="https://your-project-ref.supabase.co"
+NEXT_PUBLIC_SUPABASE_ANON_KEY="your public anon key"
+SUPABASE_SERVICE_ROLE_KEY="your server-only service role key"
+```
+
+Apply committed migrations to production with:
+
+```bash
+npm run prisma:deploy
+```
+
+Use `npm run prisma:seed` against production only when you intentionally want the demo organization and sample cabinet-shop records in that database.
+
 ## Current MVP Persistence
 
 Project creation, project list, project detail, project areas/cabinet items, and project tasks are wired to Prisma/PostgreSQL. Configure `DATABASE_URL`, run the Prisma setup commands above, and seed the database before using the project flow locally.
