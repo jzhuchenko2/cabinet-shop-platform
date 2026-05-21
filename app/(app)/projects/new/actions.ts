@@ -2,8 +2,6 @@
 
 import { redirect } from "next/navigation";
 import type { DepartmentKey } from "@prisma/client";
-import { getCurrentUser } from "@/lib/auth";
-import { createProject } from "@/lib/db/projects";
 import { requiredString } from "@/lib/validations/common";
 
 export type CreateProjectState = {
@@ -14,6 +12,11 @@ export async function createProjectAction(
   _previousState: CreateProjectState,
   formData: FormData
 ): Promise<CreateProjectState> {
+  const [{ getCurrentUser }, { createProject }] = await Promise.all([
+    import("@/lib/auth"),
+    import("@/lib/db/projects")
+  ]);
+
   const currentUser = await getCurrentUser();
 
   if (!currentUser) {
