@@ -56,7 +56,7 @@ The seed creates one sample organization, the default cabinet-shop departments, 
 
 ## Vercel Deployment
 
-Use Supabase Postgres for the production database and add these environment variables in Vercel:
+Use Supabase Postgres for the production database. In Vercel, keep one project connected to the GitHub repo, set the production branch to `main`, and add these environment variables for Production, Preview, and Development:
 
 ```bash
 DATABASE_URL="Supabase pooled/runtime connection string"
@@ -72,6 +72,8 @@ Apply committed migrations to production with:
 ```bash
 npm run prisma:deploy
 ```
+
+The production build runs `prisma generate && next build` so Vercel has a generated Prisma client before compiling the Next.js app. Run migrations from your machine or a trusted CI step before redeploying; do not rely on `next build` to change the production database schema.
 
 Use `npm run prisma:seed` against production only when you intentionally want the demo organization and sample cabinet-shop records in that database.
 
