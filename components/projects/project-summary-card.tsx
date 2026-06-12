@@ -11,12 +11,16 @@ export type ProjectSummary = {
 
 export function ProjectSummaryCard({ project }: { project: ProjectSummary }) {
   return (
-    <article className="card">
-      <h3>{project.name}</h3>
-      <p className="muted">{project.client}</p>
-      <p>{project.department}</p>
-      <p className="muted">Due {project.dueDate}</p>
-      <div className="grid">
+    <article className="card project-card">
+      <div>
+        <h3>{project.name}</h3>
+        <p className="muted">{project.client}</p>
+      </div>
+      <div className="project-card-meta">
+        <span>{project.department}</span>
+        <span className="muted">Due {project.dueDate}</span>
+      </div>
+      <div className="project-card-actions">
         <span className={project.status === "Blocked" ? "status-pill blocked" : "status-pill ready"}>
           {project.status}
         </span>

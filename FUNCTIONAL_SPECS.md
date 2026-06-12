@@ -23,21 +23,14 @@ Every project moves through the cabinet-shop department flow:
 
 1. Sales
 2. Design
-3. Approval
-4. Scheduling
-5. Purchasing
-6. Cut/Mill
-7. Face Frame
-8. Assembly
-9. Sand/Prep
-10. Finish
-11. Final Assembly
-12. QC
-13. Delivery
-14. Install
-15. Closeout
+3. Engineering
+4. Milling
+5. Construction
+6. Finish
+7. Delivery
+8. Install
 
-Each project has one current department stage. Departments can own tasks, blockers, notes, files, due dates, and time logs.
+Each project has one current department stage. Departments can own tasks, blockers, notes, files, due dates, deadlines, and time logs.
 
 ## Visual Identity
 
@@ -103,8 +96,10 @@ Recommended future data model additions:
 ### Dashboard
 
 - Shows high-level active project counts, blocked work, and due work.
-- Shows the shop workflow in order.
+- Shows the shop workflow in order: Sales, Design, Engineering, Milling, Construction, Finish, Delivery, and Install.
+- Shows a deadline for each workflow department.
 - Gives managers a quick path to create a new project.
+- Gives managers quick access to notifications and the client archive.
 
 ### Projects
 
@@ -137,10 +132,13 @@ Recommended future data model additions:
 - Task statuses are TODO, READY, IN_PROGRESS, BLOCKED, DONE, and CANCELED.
 - Current MVP behavior: project tasks are listed from PostgreSQL, users can add basic tasks from the project tasks page, and task statuses can be updated from the task table.
 
-### Department Board
+### Work Area Views
 
-- Departments are shown in the standard workflow order.
-- Department views show active jobs, active tasks, and blockers.
+- The left navigation includes Dashboard, Projects, Shop Floor, Sales, Design, and Engineering.
+- Shop Floor covers labor and production work outside the office.
+- Sales covers quotes, customer approvals, and additional contracts.
+- Design covers files, drawings, plans, and approval packets.
+- Engineering covers in-shop engineering, shop drawings, cut lists, and production release.
 - Managers should be able to see what is ready for handoff and what needs attention.
 
 ### Notes
@@ -222,6 +220,9 @@ Organizations are the tenant boundary for the SaaS product. Departments are conf
 10. Add admin settings screens for users, departments, positions, and permissions.
 11. Add a pricing/cost visibility permission separate from general project visibility.
 12. Add audit logging for permission, position, user, and destructive record changes.
+13. Add worker clock-in and clock-out flows for shop labor.
+14. Track project revenue and profitability in dollars.
+15. Add role-specific views, including full manager access and restricted worker access without dashboard visibility.
 
 ## Permissions Module To-Dos
 

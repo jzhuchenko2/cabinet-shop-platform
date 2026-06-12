@@ -21,7 +21,7 @@ export default function ProjectTimePage({ params }: { params: { projectId: strin
             },
             {
               user: "Sam",
-              department: "Cut/Mill",
+              department: "Milling",
               minutes: 240,
               workDate: "Apr 29",
               notes: "Material prep"
@@ -32,4 +32,3 @@ export default function ProjectTimePage({ params }: { params: { projectId: strin
     </>
   );
 }
-

@@ -40,11 +40,11 @@ async function main() {
   );
 
   const designDepartment = departments.find((department) => department.workflowKey === "DESIGN");
-  const approvalDepartment = departments.find((department) => department.workflowKey === "APPROVAL");
-  const purchasingDepartment = departments.find((department) => department.workflowKey === "PURCHASING");
-  const cutMillDepartment = departments.find((department) => department.workflowKey === "CUT_MILL");
+  const engineeringDepartment = departments.find((department) => department.workflowKey === "APPROVAL");
+  const millingDepartment = departments.find((department) => department.workflowKey === "CUT_MILL");
+  const constructionDepartment = departments.find((department) => department.workflowKey === "ASSEMBLY");
 
-  if (!designDepartment || !approvalDepartment || !purchasingDepartment || !cutMillDepartment) {
+  if (!designDepartment || !engineeringDepartment || !millingDepartment || !constructionDepartment) {
     throw new Error("Required seed departments were not created.");
   }
 
@@ -88,14 +88,14 @@ async function main() {
     where: { email: "riley@example.com" },
     update: {
       organizationId: organization.id,
-      departmentId: purchasingDepartment.id,
+      departmentId: engineeringDepartment.id,
       name: "Riley Chen",
       role: "PURCHASER",
       isActive: true
     },
     create: {
       organizationId: organization.id,
-      departmentId: purchasingDepartment.id,
+      departmentId: engineeringDepartment.id,
       email: "riley@example.com",
       name: "Riley Chen",
       role: "PURCHASER"
@@ -106,14 +106,14 @@ async function main() {
     where: { email: "sam@example.com" },
     update: {
       organizationId: organization.id,
-      departmentId: cutMillDepartment.id,
+      departmentId: millingDepartment.id,
       name: "Sam Rivera",
       role: "SHOP_LEAD",
       isActive: true
     },
     create: {
       organizationId: organization.id,
-      departmentId: cutMillDepartment.id,
+      departmentId: millingDepartment.id,
       email: "sam@example.com",
       name: "Sam Rivera",
       role: "SHOP_LEAD"
@@ -242,7 +242,7 @@ async function main() {
       projectId: project.id,
       areaId: island.id,
       cabinetItemId: islandPanels.id,
-      departmentId: approvalDepartment.id,
+      departmentId: engineeringDepartment.id,
       assigneeId: owner.id,
       createdById: designer.id,
       title: "Approve finish sample",
@@ -258,10 +258,10 @@ async function main() {
   await prisma.task.create({
     data: {
       projectId: project.id,
-      departmentId: purchasingDepartment.id,
+      departmentId: constructionDepartment.id,
       assigneeId: purchaser.id,
       createdById: owner.id,
-      title: "Order drawer slides",
+      title: "Stage drawer slide hardware",
       status: "READY",
       priority: "NORMAL",
       dueDate: new Date("2026-05-07T12:00:00.000Z")
@@ -374,7 +374,7 @@ async function main() {
       {
         userId: shopLead.id,
         projectId: project.id,
-        departmentId: cutMillDepartment.id,
+        departmentId: millingDepartment.id,
         cabinetItemId: islandPanels.id,
         minutes: 240,
         workDate: new Date("2026-04-29T12:00:00.000Z"),
@@ -394,4 +394,3 @@ main()
   .finally(async () => {
     await prisma.$disconnect();
   });
-

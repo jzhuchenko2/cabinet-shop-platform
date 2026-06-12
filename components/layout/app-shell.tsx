@@ -3,9 +3,10 @@ import Link from "next/link";
 const navItems = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/projects", label: "Projects" },
-  { href: "/departments", label: "Departments" },
-  { href: "/clients", label: "Clients" },
-  { href: "/notifications", label: "Notifications" }
+  { href: "/shop-floor", label: "Shop Floor" },
+  { href: "/sales", label: "Sales" },
+  { href: "/design", label: "Design" },
+  { href: "/engineering", label: "Engineering" }
 ];
 
 export function AppShell({ children }: { children: React.ReactNode }) {
