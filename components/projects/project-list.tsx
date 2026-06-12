@@ -2,7 +2,7 @@ import { ProjectSummaryCard, type ProjectSummary } from "@/components/projects/p
 
 export function ProjectList({ projects }: { projects: ProjectSummary[] }) {
   return (
-    <section className="grid grid-3">
+    <section className="project-grid">
       {projects.length > 0 ? (
         projects.map((project) => <ProjectSummaryCard key={project.id} project={project} />)
       ) : (

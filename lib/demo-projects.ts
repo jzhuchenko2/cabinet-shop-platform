@@ -21,7 +21,7 @@ export const sampleProjects: ProjectSummary[] = [
     id: "sample-library",
     name: "Maple Library Built-Ins",
     client: "Harlow Homes",
-    department: "Approval",
+    department: "Engineering",
     dueDate: "May 14",
     status: "Blocked"
   },
@@ -29,7 +29,7 @@ export const sampleProjects: ProjectSummary[] = [
     id: "sample-vanity",
     name: "Oak Vanity Package",
     client: "Ridgeline Remodel",
-    department: "Cut/Mill",
+    department: "Milling",
     dueDate: "May 18",
     status: "Ready"
   }
@@ -60,4 +60,3 @@ export function createProjectId(name: string) {
 
   return `${slug || "project"}-${Date.now()}`;
 }
-

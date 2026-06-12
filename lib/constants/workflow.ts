@@ -1,20 +1,12 @@
 export const departmentWorkflow = [
-  { key: "SALES", name: "Sales" },
-  { key: "DESIGN", name: "Design" },
-  { key: "APPROVAL", name: "Approval" },
-  { key: "SCHEDULING", name: "Scheduling" },
-  { key: "PURCHASING", name: "Purchasing" },
-  { key: "CUT_MILL", name: "Cut/Mill" },
-  { key: "FACE_FRAME", name: "Face Frame" },
-  { key: "ASSEMBLY", name: "Assembly" },
-  { key: "SAND_PREP", name: "Sand/Prep" },
-  { key: "FINISH", name: "Finish" },
-  { key: "FINAL_ASSEMBLY", name: "Final Assembly" },
-  { key: "QC", name: "QC" },
-  { key: "DELIVERY", name: "Delivery" },
-  { key: "INSTALL", name: "Install" },
-  { key: "CLOSEOUT", name: "Closeout" }
+  { key: "SALES", name: "Sales", deadline: "2 business days" },
+  { key: "DESIGN", name: "Design", deadline: "5 business days" },
+  { key: "APPROVAL", name: "Engineering", deadline: "3 business days" },
+  { key: "CUT_MILL", name: "Milling", deadline: "2 business days" },
+  { key: "ASSEMBLY", name: "Construction", deadline: "6 business days" },
+  { key: "FINISH", name: "Finish", deadline: "4 business days" },
+  { key: "DELIVERY", name: "Delivery", deadline: "1 business day" },
+  { key: "INSTALL", name: "Install", deadline: "2 business days" }
 ] as const;
 
 export type DepartmentWorkflowKey = (typeof departmentWorkflow)[number]["key"];
-

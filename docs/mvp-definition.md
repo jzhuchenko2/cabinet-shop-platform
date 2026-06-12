@@ -17,11 +17,12 @@ The first customer is a small to mid-sized custom cabinet shop that needs better
 
 - User authentication
 - Project list and project detail pages
+- Client records with active files and archived project history
 - Project status and department stage tracking
 - Task model with department ownership
-- Department board view
+- Shop Floor, Sales, Design, and Engineering work views
 - File upload for project documents and images
-- Notifications for important updates
+- Dashboard notification bell and side panel for task assignments, project changes, blocked work, file uploads, and other important updates
 - Time logging for tasks or departments
 
 ## Roles
@@ -51,3 +52,9 @@ The first customer is a small to mid-sized custom cabinet shop that needs better
 - Payroll system
 - Generic construction project management platform
 - Deep ERP replacement in the first release
+
+## Future Specs To Track
+
+- Add worker clock-in and clock-out flows for cabinet-shop labor time.
+- Track project revenue and profitability so managers can see how many dollars each project made.
+- Add role-specific views and access controls, including manager access to the full dashboard and restricted worker access without the dashboard view.
