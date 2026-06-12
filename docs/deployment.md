@@ -31,6 +31,8 @@ SUPABASE_SERVICE_ROLE_KEY="server-only service role key"
 
 After saving environment variables, redeploy. Existing deployments do not automatically receive newly added environment variables.
 
+If Vercel fails during `Collecting page data` with a Prisma stack trace, verify the failed environment has these variables set. Preview and Production each need their own values unless the variables are shared across all environments.
+
 ## Database Migration
 
 Run migrations against Supabase before relying on the deployed app:
