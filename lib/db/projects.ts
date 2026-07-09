@@ -1,5 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import type { DepartmentKey } from "@prisma/client";
+import type { CurrentUser } from "@/lib/auth";
+import { isDepartmentLead, isFullAccess } from "@/lib/rbac";
 
 export function listProjects(organizationId: string) {
   return prisma.project.findMany({
@@ -10,6 +12,54 @@ export function listProjects(organizationId: string) {
     },
     orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }]
   });
+}
+
+export function listAccessibleProjects(user: CurrentUser) {
+  const where = isFullAccess(user)
+    ? { organizationId: user.organizationId }
+    : isDepartmentLead(user)
+      ? {
+          organizationId: user.organizationId,
+          OR: [
+            { currentDepartmentId: user.departmentId ?? "__missing-department__" },
+            { tasks: { some: { departmentId: user.departmentId ?? "__missing-department__" } } }
+          ]
+        }
+      : {
+          organizationId: user.organizationId,
+          tasks: { some: { assigneeId: user.id } }
+        };
+
+  return prisma.project.findMany({
+    where,
+    include: {
+      client: true,
+      currentDepartment: true
+    },
+    orderBy: [{ status: "asc" }, { dueDate: "asc" }, { createdAt: "desc" }]
+  });
+}
+
+export async function canAccessProject(projectId: string, user: CurrentUser) {
+  const project = await prisma.project.findFirst({
+    where: {
+      id: projectId,
+      organizationId: user.organizationId,
+      ...(isFullAccess(user)
+        ? {}
+        : isDepartmentLead(user)
+          ? {
+              OR: [
+                { currentDepartmentId: user.departmentId ?? "__missing-department__" },
+                { tasks: { some: { departmentId: user.departmentId ?? "__missing-department__" } } }
+              ]
+            }
+          : { tasks: { some: { assigneeId: user.id } } })
+    },
+    select: { id: true }
+  });
+
+  return Boolean(project);
 }
 
 export function getProject(projectId: string) {

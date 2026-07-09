@@ -3,20 +3,21 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
 }
 
 model Organization {
-  id          String       @id @default(cuid())
-  name        String
-  users       User[]
-  departments Department[]
-  clients     Client[]
-  projects    Project[]
-  createdAt   DateTime     @default(now())
-  updatedAt   DateTime     @updatedAt
+  id               String           @id @default(cuid())
+  name             String
+  users            User[]
+  departments      Department[]
+  clients          Client[]
+  projects         Project[]
+  timeClockEntries TimeClockEntry[]
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
 }
 
 model User {
@@ -30,16 +31,17 @@ model User {
   role           UserRole     @default(DEPARTMENT_USER)
   isActive       Boolean      @default(true)
 
-  assignedTasks  Task[]       @relation("TaskAssignee")
-  createdTasks   Task[]       @relation("TaskCreator")
-  notes          Note[]
-  notifications  Notification[]
-  timeLogs       TimeLog[]
-  uploadedFiles  File[]
-  uploadedPhotos Photo[]
+  assignedTasks    Task[]           @relation("TaskAssignee")
+  createdTasks     Task[]           @relation("TaskCreator")
+  notes            Note[]
+  notifications    Notification[]
+  timeLogs         TimeLog[]
+  timeClockEntries TimeClockEntry[]
+  uploadedFiles    File[]
+  uploadedPhotos   Photo[]
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([organizationId])
   @@index([departmentId])
@@ -57,8 +59,8 @@ model Department {
   tasks          Task[]
   timeLogs       TimeLog[]
 
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([organizationId, workflowKey])
   @@index([organizationId, sortOrder])
@@ -76,42 +78,42 @@ model Client {
   notes          String?
   projects       Project[]
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([organizationId])
 }
 
 model Project {
-  id                  String        @id @default(cuid())
+  id                  String       @id @default(cuid())
   organizationId      String
-  organization        Organization  @relation(fields: [organizationId], references: [id])
+  organization        Organization @relation(fields: [organizationId], references: [id])
   clientId            String
-  client              Client        @relation(fields: [clientId], references: [id])
+  client              Client       @relation(fields: [clientId], references: [id])
   currentDepartmentId String?
-  currentDepartment   Department?   @relation(fields: [currentDepartmentId], references: [id])
+  currentDepartment   Department?  @relation(fields: [currentDepartmentId], references: [id])
 
-  name                String
-  jobNumber           String?
-  description         String?
-  status              ProjectStatus @default(ACTIVE)
-  priority            Priority      @default(NORMAL)
-  dueDate             DateTime?
-  installDate         DateTime?
-  isBlocked           Boolean       @default(false)
-  blockedReason       String?
+  name          String
+  jobNumber     String?
+  description   String?
+  status        ProjectStatus @default(ACTIVE)
+  priority      Priority      @default(NORMAL)
+  dueDate       DateTime?
+  installDate   DateTime?
+  isBlocked     Boolean       @default(false)
+  blockedReason String?
 
-  areas               Area[]
-  cabinetItems        CabinetItem[]
-  tasks               Task[]
-  notes               Note[]
-  files               File[]
-  photos              Photo[]
-  notifications       Notification[]
-  timeLogs            TimeLog[]
+  areas         Area[]
+  cabinetItems  CabinetItem[]
+  tasks         Task[]
+  notes         Note[]
+  files         File[]
+  photos        Photo[]
+  notifications Notification[]
+  timeLogs      TimeLog[]
 
-  createdAt           DateTime      @default(now())
-  updatedAt           DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([organizationId, jobNumber])
   @@index([organizationId, status])
@@ -120,12 +122,12 @@ model Project {
 }
 
 model Area {
-  id           String        @id @default(cuid())
-  projectId    String
-  project      Project       @relation(fields: [projectId], references: [id])
-  name         String
-  description  String?
-  sortOrder    Int           @default(0)
+  id          String  @id @default(cuid())
+  projectId   String
+  project     Project @relation(fields: [projectId], references: [id])
+  name        String
+  description String?
+  sortOrder   Int     @default(0)
 
   cabinetItems CabinetItem[]
   tasks        Task[]
@@ -134,18 +136,18 @@ model Area {
   photos       Photo[]
   timeLogs     TimeLog[]
 
-  createdAt    DateTime      @default(now())
-  updatedAt    DateTime      @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId, sortOrder])
 }
 
 model CabinetItem {
-  id          String            @id @default(cuid())
-  projectId   String
-  project     Project           @relation(fields: [projectId], references: [id])
-  areaId      String?
-  area        Area?             @relation(fields: [areaId], references: [id])
+  id        String  @id @default(cuid())
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id])
+  areaId    String?
+  area      Area?   @relation(fields: [areaId], references: [id])
 
   name        String
   itemNumber  String?
@@ -160,50 +162,50 @@ model CabinetItem {
   finish      String?
   hardware    String?
 
-  tasks       Task[]
-  notes       Note[]
-  files       File[]
-  photos      Photo[]
-  timeLogs    TimeLog[]
+  tasks    Task[]
+  notes    Note[]
+  files    File[]
+  photos   Photo[]
+  timeLogs TimeLog[]
 
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId])
   @@index([areaId])
 }
 
 model Task {
-  id             String       @id @default(cuid())
-  projectId      String
-  project        Project      @relation(fields: [projectId], references: [id])
-  areaId         String?
-  area           Area?        @relation(fields: [areaId], references: [id])
-  cabinetItemId  String?
-  cabinetItem    CabinetItem? @relation(fields: [cabinetItemId], references: [id])
-  departmentId   String?
-  department     Department?  @relation(fields: [departmentId], references: [id])
-  assigneeId     String?
-  assignee       User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
-  createdById    String?
-  createdBy      User?        @relation("TaskCreator", fields: [createdById], references: [id])
+  id            String       @id @default(cuid())
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id])
+  areaId        String?
+  area          Area?        @relation(fields: [areaId], references: [id])
+  cabinetItemId String?
+  cabinetItem   CabinetItem? @relation(fields: [cabinetItemId], references: [id])
+  departmentId  String?
+  department    Department?  @relation(fields: [departmentId], references: [id])
+  assigneeId    String?
+  assignee      User?        @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdById   String?
+  createdBy     User?        @relation("TaskCreator", fields: [createdById], references: [id])
 
-  title          String
-  description    String?
-  status         TaskStatus   @default(TODO)
-  priority       Priority     @default(NORMAL)
-  dueDate        DateTime?
-  completedAt    DateTime?
-  isBlocked      Boolean      @default(false)
-  blockedReason  String?
+  title         String
+  description   String?
+  status        TaskStatus @default(TODO)
+  priority      Priority   @default(NORMAL)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  isBlocked     Boolean    @default(false)
+  blockedReason String?
 
-  notes          Note[]
-  files          File[]
-  photos         Photo[]
-  timeLogs       TimeLog[]
+  notes    Note[]
+  files    File[]
+  photos   Photo[]
+  timeLogs TimeLog[]
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId])
   @@index([departmentId, status])
@@ -212,122 +214,141 @@ model Task {
 }
 
 model Note {
-  id             String       @id @default(cuid())
-  projectId      String
-  project        Project      @relation(fields: [projectId], references: [id])
-  areaId         String?
-  area           Area?        @relation(fields: [areaId], references: [id])
-  cabinetItemId  String?
-  cabinetItem    CabinetItem? @relation(fields: [cabinetItemId], references: [id])
-  taskId         String?
-  task           Task?        @relation(fields: [taskId], references: [id])
-  authorId       String
-  author         User         @relation(fields: [authorId], references: [id])
+  id            String       @id @default(cuid())
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id])
+  areaId        String?
+  area          Area?        @relation(fields: [areaId], references: [id])
+  cabinetItemId String?
+  cabinetItem   CabinetItem? @relation(fields: [cabinetItemId], references: [id])
+  taskId        String?
+  task          Task?        @relation(fields: [taskId], references: [id])
+  authorId      String
+  author        User         @relation(fields: [authorId], references: [id])
 
-  body           String
-  noteType       NoteType     @default(GENERAL)
+  body     String
+  noteType NoteType @default(GENERAL)
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId, createdAt])
   @@index([authorId])
 }
 
 model File {
-  id             String       @id @default(cuid())
-  projectId      String
-  project        Project      @relation(fields: [projectId], references: [id])
-  areaId         String?
-  area           Area?        @relation(fields: [areaId], references: [id])
-  cabinetItemId  String?
-  cabinetItem    CabinetItem? @relation(fields: [cabinetItemId], references: [id])
-  taskId         String?
-  task           Task?        @relation(fields: [taskId], references: [id])
-  uploadedById   String
-  uploadedBy     User         @relation(fields: [uploadedById], references: [id])
+  id            String       @id @default(cuid())
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id])
+  areaId        String?
+  area          Area?        @relation(fields: [areaId], references: [id])
+  cabinetItemId String?
+  cabinetItem   CabinetItem? @relation(fields: [cabinetItemId], references: [id])
+  taskId        String?
+  task          Task?        @relation(fields: [taskId], references: [id])
+  uploadedById  String
+  uploadedBy    User         @relation(fields: [uploadedById], references: [id])
 
-  name           String
-  storagePath    String
-  mimeType       String?
-  sizeBytes      Int?
-  fileType       FileType     @default(DOCUMENT)
+  name        String
+  storagePath String
+  mimeType    String?
+  sizeBytes   Int?
+  fileType    FileType @default(DOCUMENT)
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId, createdAt])
   @@index([uploadedById])
 }
 
 model Photo {
-  id             String       @id @default(cuid())
-  projectId      String
-  project        Project      @relation(fields: [projectId], references: [id])
-  areaId         String?
-  area           Area?        @relation(fields: [areaId], references: [id])
-  cabinetItemId  String?
-  cabinetItem    CabinetItem? @relation(fields: [cabinetItemId], references: [id])
-  taskId         String?
-  task           Task?        @relation(fields: [taskId], references: [id])
-  uploadedById   String
-  uploadedBy     User         @relation(fields: [uploadedById], references: [id])
+  id            String       @id @default(cuid())
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id])
+  areaId        String?
+  area          Area?        @relation(fields: [areaId], references: [id])
+  cabinetItemId String?
+  cabinetItem   CabinetItem? @relation(fields: [cabinetItemId], references: [id])
+  taskId        String?
+  task          Task?        @relation(fields: [taskId], references: [id])
+  uploadedById  String
+  uploadedBy    User         @relation(fields: [uploadedById], references: [id])
 
-  caption        String?
-  storagePath    String
-  mimeType       String?
-  sizeBytes      Int?
+  caption     String?
+  storagePath String
+  mimeType    String?
+  sizeBytes   Int?
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId, createdAt])
   @@index([uploadedById])
 }
 
 model Notification {
-  id        String           @id @default(cuid())
+  id        String   @id @default(cuid())
   userId    String
-  user      User             @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
   projectId String?
-  project   Project?         @relation(fields: [projectId], references: [id])
+  project   Project? @relation(fields: [projectId], references: [id])
 
-  type      NotificationType
-  title     String
-  body      String?
-  readAt    DateTime?
+  type   NotificationType
+  title  String
+  body   String?
+  readAt DateTime?
 
-  createdAt DateTime         @default(now())
+  createdAt DateTime @default(now())
 
   @@index([userId, readAt])
   @@index([projectId])
 }
 
 model TimeLog {
-  id             String       @id @default(cuid())
-  userId         String
-  user           User         @relation(fields: [userId], references: [id])
-  projectId      String
-  project        Project      @relation(fields: [projectId], references: [id])
-  departmentId   String?
-  department     Department?  @relation(fields: [departmentId], references: [id])
-  areaId         String?
-  area           Area?        @relation(fields: [areaId], references: [id])
-  cabinetItemId  String?
-  cabinetItem    CabinetItem? @relation(fields: [cabinetItemId], references: [id])
-  taskId         String?
-  task           Task?        @relation(fields: [taskId], references: [id])
+  id            String       @id @default(cuid())
+  userId        String
+  user          User         @relation(fields: [userId], references: [id])
+  projectId     String
+  project       Project      @relation(fields: [projectId], references: [id])
+  departmentId  String?
+  department    Department?  @relation(fields: [departmentId], references: [id])
+  areaId        String?
+  area          Area?        @relation(fields: [areaId], references: [id])
+  cabinetItemId String?
+  cabinetItem   CabinetItem? @relation(fields: [cabinetItemId], references: [id])
+  taskId        String?
+  task          Task?        @relation(fields: [taskId], references: [id])
 
-  minutes        Int
-  workDate       DateTime
-  notes          String?
+  minutes  Int
+  workDate DateTime
+  notes    String?
 
-  createdAt      DateTime     @default(now())
-  updatedAt      DateTime     @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@index([projectId, workDate])
   @@index([userId, workDate])
   @@index([departmentId])
+}
+
+model TimeClockEntry {
+  id             String       @id @default(cuid())
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  userId         String
+  user           User         @relation(fields: [userId], references: [id])
+
+  startedAt        DateTime  @default(now())
+  endedAt          DateTime?
+  source           String    @default("MANUAL")
+  verificationNote String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId, endedAt])
+  @@index([userId, endedAt])
 }
 
 enum UserRole {

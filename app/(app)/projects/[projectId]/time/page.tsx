@@ -1,7 +1,27 @@
 import { TimeLogList } from "@/components/time-logs/time-log-list";
+import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
+import { getCurrentUser } from "@/lib/auth";
+import { listProjectTimeLogs } from "@/lib/db/time-logs";
+import { hasPermission } from "@/lib/rbac";
 
-export default function ProjectTimePage({ params }: { params: { projectId: string } }) {
+function formatWorkDate(value: Date) {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric"
+  }).format(value);
+}
+
+export default async function ProjectTimePage({ params }: { params: { projectId: string } }) {
+  const currentUser = await getCurrentUser();
+
+  if (!hasPermission(currentUser, "view_time_logs")) {
+    return <AccessDenied description="Time logs are limited to managers and admins." />;
+  }
+
+  const timeLogs = await listProjectTimeLogs(params.projectId);
+
   return (
     <>
       <PageHeader
@@ -11,22 +31,14 @@ export default function ProjectTimePage({ params }: { params: { projectId: strin
       />
       <section className="card">
         <TimeLogList
-          timeLogs={[
-            {
-              user: "Taylor",
-              department: "Design",
-              minutes: 180,
-              workDate: "Apr 28",
-              notes: "Drawing revisions"
-            },
-            {
-              user: "Sam",
-              department: "Milling",
-              minutes: 240,
-              workDate: "Apr 29",
-              notes: "Material prep"
-            }
-          ]}
+          timeLogs={timeLogs.map((log) => ({
+            id: log.id,
+            user: log.user.name,
+            department: log.department?.name ?? "Unassigned",
+            minutes: log.minutes,
+            workDate: formatWorkDate(log.workDate),
+            notes: log.notes ?? ""
+          }))}
         />
       </section>
     </>

@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
+import { getCurrentUser } from "@/lib/auth";
+import { hasPermission } from "@/lib/rbac";
 
 const clients = [
   {
@@ -55,7 +58,13 @@ const archivedClientFiles = [
   }
 ];
 
-export default function ClientsPage() {
+export default async function ClientsPage() {
+  const currentUser = await getCurrentUser();
+
+  if (!hasPermission(currentUser, "view_clients")) {
+    return <AccessDenied description="Client records are limited to managers and admins." />;
+  }
+
   return (
     <>
       <PageHeader

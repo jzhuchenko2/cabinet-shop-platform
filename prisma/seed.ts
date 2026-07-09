@@ -66,6 +66,24 @@ async function main() {
     }
   });
 
+  const manager = await prisma.user.upsert({
+    where: { email: "manager@example.com" },
+    update: {
+      organizationId: organization.id,
+      departmentId: designDepartment.id,
+      name: "Morgan Manager",
+      role: "MANAGER",
+      isActive: true
+    },
+    create: {
+      organizationId: organization.id,
+      departmentId: designDepartment.id,
+      email: "manager@example.com",
+      name: "Morgan Manager",
+      role: "MANAGER"
+    }
+  });
+
   const designer = await prisma.user.upsert({
     where: { email: "taylor@example.com" },
     update: {
@@ -119,6 +137,26 @@ async function main() {
       role: "SHOP_LEAD"
     }
   });
+
+  const employee = await prisma.user.upsert({
+    where: { email: "casey@example.com" },
+    update: {
+      organizationId: organization.id,
+      departmentId: constructionDepartment.id,
+      name: "Casey Worker",
+      role: "DEPARTMENT_USER",
+      isActive: true
+    },
+    create: {
+      organizationId: organization.id,
+      departmentId: constructionDepartment.id,
+      email: "casey@example.com",
+      name: "Casey Worker",
+      role: "DEPARTMENT_USER"
+    }
+  });
+
+  await prisma.timeClockEntry.deleteMany({ where: { organizationId: organization.id } });
 
   const existingProject = await prisma.project.findUnique({
     where: {
@@ -268,6 +306,22 @@ async function main() {
     }
   });
 
+  await prisma.task.create({
+    data: {
+      projectId: project.id,
+      areaId: kitchen.id,
+      cabinetItemId: sinkBase.id,
+      departmentId: constructionDepartment.id,
+      assigneeId: employee.id,
+      createdById: manager.id,
+      title: "Assemble sink base box",
+      description: "Build and label the sink base box before finish handoff.",
+      status: "READY",
+      priority: "NORMAL",
+      dueDate: new Date("2026-05-08T12:00:00.000Z")
+    }
+  });
+
   await prisma.note.createMany({
     data: [
       {
@@ -381,6 +435,16 @@ async function main() {
         notes: "Material prep."
       }
     ]
+  });
+
+  await prisma.timeClockEntry.create({
+    data: {
+      organizationId: organization.id,
+      userId: employee.id,
+      startedAt: new Date("2026-07-08T15:30:00.000Z"),
+      source: "MANUAL",
+      verificationNote: "Future verification: shop Wi-Fi, QR/NFC, or geofence proximity."
+    }
   });
 
   console.log(`Seeded ${organization.name} with sample project ${jobNumber}.`);

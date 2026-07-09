@@ -123,6 +123,22 @@ textarea {
   color: #ffffff;
 }
 
+.sidebar-user {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  color: #f3f0eb;
+  display: grid;
+  gap: 4px;
+  margin-top: 28px;
+  padding-top: 18px;
+}
+
+.sidebar-user span {
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
 .main {
   min-width: 0;
   padding: 28px;
@@ -189,6 +205,10 @@ h3 {
 .grid {
   display: grid;
   gap: 16px;
+}
+
+.grid > * {
+  min-width: 0;
 }
 
 .grid-2 {
@@ -634,6 +654,7 @@ h3 {
 .field {
   display: grid;
   gap: 6px;
+  min-width: 0;
 }
 
 .field label {
@@ -647,6 +668,8 @@ h3 {
   background: #fffaf3;
   border: 1px solid var(--line);
   border-radius: 6px;
+  max-width: 100%;
+  min-width: 0;
   padding: 10px 12px;
   width: 100%;
 }

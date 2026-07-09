@@ -7,6 +7,7 @@ export type TaskRow = {
   status: "TODO" | "READY" | "IN_PROGRESS" | "BLOCKED" | "DONE" | "CANCELED";
   priority?: string;
   scope?: string;
+  projectId?: string;
 };
 
 const taskStatuses = ["TODO", "READY", "IN_PROGRESS", "BLOCKED", "DONE", "CANCELED"] as const;
@@ -31,10 +32,12 @@ function StatusBadge({ status }: { status: TaskRow["status"] }) {
 
 export function TaskTable({
   tasks,
-  updateStatusAction
+  updateStatusAction,
+  showProjectIdInputs = false
 }: {
   tasks: TaskRow[];
   updateStatusAction?: UpdateStatusAction;
+  showProjectIdInputs?: boolean;
 }) {
   if (tasks.length === 0) {
     return <p className="muted">No tasks have been added to this project yet.</p>;
@@ -66,6 +69,9 @@ export function TaskTable({
               {updateStatusAction && task.id ? (
                 <form action={updateStatusAction} className="task-status-control">
                   <input name="taskId" type="hidden" value={task.id} />
+                  {showProjectIdInputs && task.projectId ? (
+                    <input name="projectId" type="hidden" value={task.projectId} />
+                  ) : null}
                   <StatusBadge status={task.status} />
                   <select aria-label={`Change status for ${task.title}`} name="status" defaultValue={task.status}>
                     {taskStatuses.map((status) => (
