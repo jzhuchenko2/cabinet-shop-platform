@@ -1,4 +1,5 @@
 export type TimeLogRow = {
+  id: string;
   user: string;
   department: string;
   minutes: number;
@@ -7,6 +8,10 @@ export type TimeLogRow = {
 };
 
 export function TimeLogList({ timeLogs }: { timeLogs: TimeLogRow[] }) {
+  if (timeLogs.length === 0) {
+    return <p className="muted">No time logs have been recorded for this project yet.</p>;
+  }
+
   return (
     <table className="table">
       <thead>
@@ -20,7 +25,7 @@ export function TimeLogList({ timeLogs }: { timeLogs: TimeLogRow[] }) {
       </thead>
       <tbody>
         {timeLogs.map((log) => (
-          <tr key={`${log.user}-${log.workDate}-${log.department}`}>
+          <tr key={log.id}>
             <td>{log.user}</td>
             <td>{log.department}</td>
             <td>{log.minutes}</td>
@@ -32,4 +37,3 @@ export function TimeLogList({ timeLogs }: { timeLogs: TimeLogRow[] }) {
     </table>
   );
 }
-

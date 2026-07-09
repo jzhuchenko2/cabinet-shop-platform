@@ -1,13 +1,15 @@
 import { notFound } from "next/navigation";
 import { TaskForm } from "@/components/tasks/task-form";
 import { TaskTable } from "@/components/tasks/task-table";
+import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
 import { getCurrentUser } from "@/lib/auth";
 import { listProjectAreas, listUnassignedProjectCabinetItems } from "@/lib/db/areas";
 import { listDepartmentOptions } from "@/lib/db/departments";
-import { getProject } from "@/lib/db/projects";
-import { listProjectTasks } from "@/lib/db/tasks";
+import { canAccessProject, getProject } from "@/lib/db/projects";
+import { listAccessibleProjectTasks } from "@/lib/db/tasks";
 import { listOrganizationUsers } from "@/lib/db/users";
+import { hasPermission } from "@/lib/rbac";
 import { createTaskAction, updateTaskStatusAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -31,13 +33,18 @@ export default async function ProjectTasksPage({ params }: { params: { projectId
     notFound();
   }
 
+  if (!(await canAccessProject(params.projectId, currentUser))) {
+    return <AccessDenied description="This task list is outside your assigned work scope." />;
+  }
+
+  const canManageTasks = hasPermission(currentUser, "manage_tasks");
   const [project, tasks, areas, unassignedItems, departments, users] = await Promise.all([
     getProject(params.projectId),
-    listProjectTasks(params.projectId),
+    listAccessibleProjectTasks(params.projectId, currentUser),
     listProjectAreas(params.projectId),
     listUnassignedProjectCabinetItems(params.projectId),
-    listDepartmentOptions(currentUser.organizationId),
-    listOrganizationUsers(currentUser.organizationId)
+    canManageTasks ? listDepartmentOptions(currentUser.organizationId) : Promise.resolve([]),
+    canManageTasks ? listOrganizationUsers(currentUser.organizationId) : Promise.resolve([])
   ]);
 
   if (!project) {
@@ -88,13 +95,20 @@ export default async function ProjectTasksPage({ params }: { params: { projectId
         <div className="card">
           <TaskTable tasks={taskRows} updateStatusAction={updateStatusForProject} />
         </div>
-        <TaskForm
-          action={createTaskForProject}
-          areas={areas.map((area) => ({ id: area.id, name: area.name }))}
-          cabinetItems={cabinetItemOptions}
-          departments={departments.map((department) => ({ id: department.id, name: department.name }))}
-          users={users.map((user) => ({ id: user.id, name: user.name }))}
-        />
+        {canManageTasks ? (
+          <TaskForm
+            action={createTaskForProject}
+            areas={areas.map((area) => ({ id: area.id, name: area.name }))}
+            cabinetItems={cabinetItemOptions}
+            departments={departments.map((department) => ({ id: department.id, name: department.name }))}
+            users={users.map((user) => ({ id: user.id, name: user.name }))}
+          />
+        ) : (
+          <section className="card">
+            <h2>Limited task access</h2>
+            <p className="muted">You can update statuses for tasks assigned to you.</p>
+          </section>
+        )}
       </section>
     </>
   );

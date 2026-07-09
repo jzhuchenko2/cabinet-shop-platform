@@ -1,10 +1,23 @@
 import Link from "next/link";
+import { EmployeeDashboard } from "@/components/dashboard/employee-dashboard";
 import { DashboardNotifications } from "@/components/dashboard/dashboard-notifications";
+import { LiveTimeClockPanel } from "@/components/time-logs/live-time-clock-panel";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { departmentWorkflow } from "@/lib/constants/workflow";
+import { getCurrentUser } from "@/lib/auth";
+import { listActiveTimeClockEntries } from "@/lib/db/time-logs";
+import { isFullAccess } from "@/lib/rbac";
 
-export default function DashboardPage() {
+export default async function DashboardPage() {
+  const currentUser = await getCurrentUser();
+
+  if (!isFullAccess(currentUser) && currentUser) {
+    return <EmployeeDashboard user={currentUser} />;
+  }
+
+  const activeTimeEntries = currentUser ? await listActiveTimeClockEntries(currentUser) : [];
+
   return (
     <>
       <PageHeader
@@ -39,6 +52,16 @@ export default function DashboardPage() {
         <StatCard label="Blocked work" value="3" detail="Needs manager attention" />
         <StatCard label="Due this week" value="18" detail="Tasks and handoffs" />
       </section>
+
+      <LiveTimeClockPanel
+        entries={activeTimeEntries.map((entry) => ({
+          id: entry.id,
+          worker: entry.user.name,
+          department: entry.user.department?.name ?? "Unassigned",
+          startedAt: entry.startedAt.toISOString(),
+          verification: entry.source === "MANUAL" ? "Manual clock-in" : entry.source
+        }))}
+      />
 
       <section className="card" style={{ marginTop: 16 }}>
         <h2>Department flow</h2>

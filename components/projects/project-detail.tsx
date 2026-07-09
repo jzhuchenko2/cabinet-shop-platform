@@ -2,7 +2,9 @@ import Link from "next/link";
 import { NoteList } from "@/components/notes/note-list";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
+import type { CurrentUser } from "@/lib/auth";
 import { getProject } from "@/lib/db/projects";
+import { hasPermission, isFullAccess } from "@/lib/rbac";
 
 function formatDate(value: Date) {
   return new Intl.DateTimeFormat("en-US", {
@@ -12,7 +14,7 @@ function formatDate(value: Date) {
   }).format(value);
 }
 
-export async function ProjectDetail({ projectId }: { projectId: string }) {
+export async function ProjectDetail({ projectId, user }: { projectId: string; user: CurrentUser }) {
   const project = await getProject(projectId);
 
   if (!project) {
@@ -61,7 +63,7 @@ export async function ProjectDetail({ projectId }: { projectId: string }) {
         title={project.name}
         description={`Client: ${project.client.name}. Current stage: ${
           project.currentDepartment?.name ?? "Unassigned"
-        }. Project ID: ${projectId}.`}
+        }. ${isFullAccess(user) ? `Project ID: ${projectId}.` : "Limited project view."}`}
         action={
           <Link className="button" href={`/projects/${projectId}/tasks`}>
             View tasks
@@ -71,15 +73,21 @@ export async function ProjectDetail({ projectId }: { projectId: string }) {
       <section className="grid grid-3">
         <StatCard label="Areas" value={project._count.areas} detail="Rooms and spaces in scope" />
         <StatCard label="Cabinet items" value={project._count.cabinetItems} detail="Base, wall, tall, trim" />
-        <StatCard label="Logged time" value={`${loggedHours}h`} detail={`${loggedMinutes} minutes logged`} />
+        {hasPermission(user, "view_time_logs") ? (
+          <StatCard label="Logged time" value={`${loggedHours}h`} detail={`${loggedMinutes} minutes logged`} />
+        ) : (
+          <StatCard label="Tasks" value={project._count.tasks} detail="Assigned work items in scope" />
+        )}
       </section>
       <section className="grid grid-2" style={{ marginTop: 16 }}>
         <div className="card">
           <h2>Project links</h2>
           <div className="action-list">
-            <Link className="button secondary block" href={`/projects/${projectId}/areas`}>
-              Areas and cabinet items
-            </Link>
+            {hasPermission(user, "manage_projects") || hasPermission(user, "view_department_tasks") ? (
+              <Link className="button secondary block" href={`/projects/${projectId}/areas`}>
+                Areas and cabinet items
+              </Link>
+            ) : null}
             <Link className="button secondary block" href={`/projects/${projectId}/tasks`}>
               Tasks
             </Link>
@@ -89,9 +97,11 @@ export async function ProjectDetail({ projectId }: { projectId: string }) {
             <Link className="button secondary block" href={`/projects/${projectId}/photos`}>
               Photos
             </Link>
-            <Link className="button secondary block" href={`/projects/${projectId}/time`}>
-              Time logs
-            </Link>
+            {hasPermission(user, "view_time_logs") ? (
+              <Link className="button secondary block" href={`/projects/${projectId}/time`}>
+                Time logs
+              </Link>
+            ) : null}
           </div>
         </div>
         <div>

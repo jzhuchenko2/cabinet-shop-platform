@@ -1,6 +1,15 @@
 import { PageHeader } from "@/components/ui/page-header";
+import { AccessDenied } from "@/components/ui/access-denied";
+import { getCurrentUser } from "@/lib/auth";
+import { hasPermission } from "@/lib/rbac";
 
-export default function ClientDetailPage({ params }: { params: { clientId: string } }) {
+export default async function ClientDetailPage({ params }: { params: { clientId: string } }) {
+  const currentUser = await getCurrentUser();
+
+  if (!hasPermission(currentUser, "view_clients")) {
+    return <AccessDenied description="Client detail is limited to managers and admins." />;
+  }
+
   return (
     <>
       <PageHeader
@@ -24,4 +33,3 @@ export default function ClientDetailPage({ params }: { params: { clientId: strin
     </>
   );
 }
-

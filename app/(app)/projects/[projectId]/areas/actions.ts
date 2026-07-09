@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import type { CabinetItemType } from "@prisma/client";
+import { getCurrentUser } from "@/lib/auth";
 import { createArea, createCabinetItem } from "@/lib/db/areas";
+import { canAccessProject } from "@/lib/db/projects";
+import { hasPermission } from "@/lib/rbac";
 import { requiredString } from "@/lib/validations/common";
 
 export type CreateAreaState = {
@@ -14,6 +17,16 @@ export async function createAreaAction(
   _previousState: CreateAreaState,
   formData: FormData
 ): Promise<CreateAreaState> {
+  const currentUser = await getCurrentUser();
+
+  if (!hasPermission(currentUser, "manage_projects")) {
+    return { error: "Your role cannot create project areas." };
+  }
+
+  if (!currentUser || !(await canAccessProject(projectId, currentUser))) {
+    return { error: "You cannot create areas for this project." };
+  }
+
   try {
     const name = requiredString(formData.get("name"), "Area name");
     const descriptionValue = String(formData.get("description") ?? "").trim();
@@ -58,6 +71,16 @@ export async function createCabinetItemAction(
   _previousState: CreateCabinetItemState,
   formData: FormData
 ): Promise<CreateCabinetItemState> {
+  const currentUser = await getCurrentUser();
+
+  if (!hasPermission(currentUser, "manage_projects")) {
+    return { error: "Your role cannot create cabinet items." };
+  }
+
+  if (!currentUser || !(await canAccessProject(projectId, currentUser))) {
+    return { error: "You cannot create cabinet items for this project." };
+  }
+
   try {
     const name = requiredString(formData.get("name"), "Cabinet item name");
     const itemType = String(formData.get("itemType") ?? "OTHER") as CabinetItemType;

@@ -3,7 +3,8 @@ import { PageHeader } from "@/components/ui/page-header";
 import { ProjectList } from "@/components/projects/project-list";
 import type { ProjectSummary } from "@/components/projects/project-summary-card";
 import { getCurrentUser } from "@/lib/auth";
-import { listProjects } from "@/lib/db/projects";
+import { listAccessibleProjects } from "@/lib/db/projects";
+import { hasPermission, isFullAccess } from "@/lib/rbac";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,7 @@ function formatDueDate(dueDate: Date | null) {
   }).format(dueDate);
 }
 
-function mapProjectStatus(project: Awaited<ReturnType<typeof listProjects>>[number]): ProjectSummary["status"] {
+function mapProjectStatus(project: Awaited<ReturnType<typeof listAccessibleProjects>>[number]): ProjectSummary["status"] {
   if (project.isBlocked || project.status === "BLOCKED") {
     return "Blocked";
   }
@@ -34,7 +35,7 @@ function mapProjectStatus(project: Awaited<ReturnType<typeof listProjects>>[numb
 export default async function ProjectsPage() {
   const currentUser = await getCurrentUser();
   const projects = currentUser
-    ? (await listProjects(currentUser.organizationId)).map((project) => ({
+    ? (await listAccessibleProjects(currentUser)).map((project) => ({
         id: project.id,
         name: project.name,
         client: project.client.name,
@@ -49,11 +50,17 @@ export default async function ProjectsPage() {
       <PageHeader
         eyebrow="Jobs"
         title="Projects"
-        description="Track active cabinet jobs from first conversation through install and closeout."
+        description={
+          isFullAccess(currentUser)
+            ? "Track active cabinet jobs from first conversation through install and closeout."
+            : "Project list is limited to jobs connected to your assigned work."
+        }
         action={
-          <Link className="button" href="/projects/new">
-            New project
-          </Link>
+          hasPermission(currentUser, "manage_projects") ? (
+            <Link className="button" href="/projects/new">
+              New project
+            </Link>
+          ) : null
         }
       />
       <ProjectList projects={projects} />

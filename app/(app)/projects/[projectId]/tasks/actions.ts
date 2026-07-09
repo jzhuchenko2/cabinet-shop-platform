@@ -3,7 +3,9 @@
 import { revalidatePath } from "next/cache";
 import type { Priority, TaskStatus } from "@prisma/client";
 import { getCurrentUser } from "@/lib/auth";
-import { createTask, updateTaskStatus } from "@/lib/db/tasks";
+import { canAccessProject } from "@/lib/db/projects";
+import { canUpdateTaskStatus, createTask, updateTaskStatus } from "@/lib/db/tasks";
+import { hasPermission } from "@/lib/rbac";
 import { requiredString } from "@/lib/validations/common";
 
 export type CreateTaskState = {
@@ -24,6 +26,14 @@ export async function createTaskAction(
 
   if (!currentUser) {
     return { error: "You must be signed in to create a task." };
+  }
+
+  if (!hasPermission(currentUser, "manage_tasks")) {
+    return { error: "Your role cannot create tasks." };
+  }
+
+  if (!(await canAccessProject(projectId, currentUser))) {
+    return { error: "You cannot create tasks for this project." };
   }
 
   try {
@@ -71,6 +81,10 @@ export async function updateTaskStatusAction(projectId: string, formData: FormDa
 
   const taskId = requiredString(formData.get("taskId"), "Task");
   const status = String(formData.get("status") ?? "TODO") as TaskStatus;
+
+  if (!(await canUpdateTaskStatus(taskId, currentUser))) {
+    return;
+  }
 
   await updateTaskStatus({
     taskId,

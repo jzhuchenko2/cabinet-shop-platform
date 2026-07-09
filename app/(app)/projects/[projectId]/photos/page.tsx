@@ -1,4 +1,7 @@
+import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
+import { getCurrentUser } from "@/lib/auth";
+import { canAccessProject } from "@/lib/db/projects";
 
 const photos = [
   { caption: "Before demo", uploadedBy: "Morgan" },
@@ -6,7 +9,13 @@ const photos = [
   { caption: "Finish sample", uploadedBy: "Taylor" }
 ];
 
-export default function ProjectPhotosPage({ params }: { params: { projectId: string } }) {
+export default async function ProjectPhotosPage({ params }: { params: { projectId: string } }) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || !(await canAccessProject(params.projectId, currentUser))) {
+    return <AccessDenied description="Photos are limited to assigned project access." />;
+  }
+
   return (
     <>
       <PageHeader
@@ -34,4 +43,3 @@ export default function ProjectPhotosPage({ params }: { params: { projectId: str
     </>
   );
 }
-

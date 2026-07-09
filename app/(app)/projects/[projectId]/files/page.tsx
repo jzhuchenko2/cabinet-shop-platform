@@ -1,7 +1,16 @@
 import { AttachmentList } from "@/components/files/attachment-list";
+import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
+import { getCurrentUser } from "@/lib/auth";
+import { canAccessProject } from "@/lib/db/projects";
 
-export default function ProjectFilesPage({ params }: { params: { projectId: string } }) {
+export default async function ProjectFilesPage({ params }: { params: { projectId: string } }) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || !(await canAccessProject(params.projectId, currentUser))) {
+    return <AccessDenied description="Files are limited to assigned project access." />;
+  }
+
   return (
     <>
       <PageHeader
@@ -21,4 +30,3 @@ export default function ProjectFilesPage({ params }: { params: { projectId: stri
     </>
   );
 }
-

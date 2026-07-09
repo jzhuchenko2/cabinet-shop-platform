@@ -16,6 +16,7 @@ The first customer is a small to mid-sized custom cabinet shop that needs better
 ## Features
 
 - User authentication
+- Role-based access for owners/admins, managers, department leads, and employee contributors
 - Project list and project detail pages
 - Client records with active files and archived project history
 - Project status and department stage tracking

@@ -23,6 +23,12 @@ export async function createProjectAction(
     return { error: "You must be signed in to create a project." };
   }
 
+  const { hasPermission } = await import("@/lib/rbac");
+
+  if (!hasPermission(currentUser, "manage_projects")) {
+    return { error: "Your role cannot create projects." };
+  }
+
   let projectId: string;
 
   try {

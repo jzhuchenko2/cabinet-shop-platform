@@ -1,9 +1,12 @@
 import { notFound } from "next/navigation";
 import { AreaForm } from "@/components/projects/area-form";
 import { CabinetItemForm } from "@/components/projects/cabinet-item-form";
+import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
+import { getCurrentUser } from "@/lib/auth";
 import { listProjectAreas, listUnassignedProjectCabinetItems } from "@/lib/db/areas";
-import { getProject } from "@/lib/db/projects";
+import { canAccessProject, getProject } from "@/lib/db/projects";
+import { hasPermission } from "@/lib/rbac";
 import { createAreaAction, createCabinetItemAction } from "./actions";
 
 export const dynamic = "force-dynamic";
@@ -65,6 +68,12 @@ function CabinetItemsTable({
 }
 
 export default async function ProjectAreasPage({ params }: { params: { projectId: string } }) {
+  const currentUser = await getCurrentUser();
+
+  if (!currentUser || !(await canAccessProject(params.projectId, currentUser))) {
+    return <AccessDenied description="This project area list is outside your assigned work scope." />;
+  }
+
   const [project, areas, unassignedItems] = await Promise.all([
     getProject(params.projectId),
     listProjectAreas(params.projectId),
@@ -78,6 +87,7 @@ export default async function ProjectAreasPage({ params }: { params: { projectId
   const createAreaForProject = createAreaAction.bind(null, params.projectId);
   const createCabinetItemForProject = createCabinetItemAction.bind(null, params.projectId);
   const areaOptions = areas.map((area) => ({ id: area.id, name: area.name }));
+  const canManageProject = hasPermission(currentUser, "manage_projects");
 
   return (
     <>
@@ -118,10 +128,17 @@ export default async function ProjectAreasPage({ params }: { params: { projectId
             </article>
           ) : null}
         </div>
-        <div className="grid">
-          <AreaForm action={createAreaForProject} />
-          <CabinetItemForm action={createCabinetItemForProject} areas={areaOptions} />
-        </div>
+        {canManageProject ? (
+          <div className="grid">
+            <AreaForm action={createAreaForProject} />
+            <CabinetItemForm action={createCabinetItemForProject} areas={areaOptions} />
+          </div>
+        ) : (
+          <section className="card">
+            <h2>Read-only scope</h2>
+            <p className="muted">Your role can review assigned project scope but cannot edit areas or cabinet items.</p>
+          </section>
+        )}
       </section>
     </>
   );

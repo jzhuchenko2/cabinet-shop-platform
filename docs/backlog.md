@@ -16,6 +16,8 @@
 12. Dashboard workflow - updated to Sales, Design, Engineering, Milling, Construction, Finish, Delivery, and Install with department deadlines
 13. Project cards - compact four-column grid added for desktop project scanning
 14. Work-area pages - Shop Floor, Sales, Design, and Engineering expanded with working local MVP controls, queues, uploads, and checklists
+15. RBAC foundation - owner/admin and manager full access, shop lead department access, employee task-focused dashboard and scoped task updates
+16. RBAC test checklist - local manager vs employee access verification added in docs
 
 ## Notes
 

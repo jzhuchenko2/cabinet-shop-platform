@@ -1,15 +1,10 @@
 import Link from "next/link";
+import type { CurrentUser } from "@/lib/auth";
+import { getNavigationItems } from "@/lib/rbac";
 
-const navItems = [
-  { href: "/dashboard", label: "Dashboard" },
-  { href: "/projects", label: "Projects" },
-  { href: "/shop-floor", label: "Shop Floor" },
-  { href: "/sales", label: "Sales" },
-  { href: "/design", label: "Design" },
-  { href: "/engineering", label: "Engineering" }
-];
+export function AppShell({ children, user }: { children: React.ReactNode; user: CurrentUser | null }) {
+  const navItems = getNavigationItems(user);
 
-export function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <div className="app-shell">
       <aside className="sidebar">
@@ -27,6 +22,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
+        {user ? (
+          <div className="sidebar-user">
+            <strong>{user.name}</strong>
+            <span>{user.role.replace("_", " ")}</span>
+          </div>
+        ) : null}
       </aside>
       <main className="main">{children}</main>
     </div>
