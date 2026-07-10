@@ -27,7 +27,6 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
           <nav className="sidebar-utility-nav" aria-label="Time tracking navigation">
             {utilityNavItems.map((item) => (
               <Link className="time-card-nav-link" href={item.href} key={item.href}>
-                <span aria-hidden="true">TC</span>
                 {item.label}
               </Link>
             ))}
