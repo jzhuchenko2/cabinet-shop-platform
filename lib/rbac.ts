@@ -12,6 +12,7 @@ export type AppPermission =
   | "manage_projects"
   | "manage_tasks"
   | "view_time_logs"
+  | "view_time_cards"
   | "manage_time_clock"
   | "update_own_tasks"
   | "view_department_tasks";
@@ -32,6 +33,7 @@ const rolePermissions: Record<UserRole, AppPermission[]> = {
     "manage_projects",
     "manage_tasks",
     "view_time_logs",
+    "view_time_cards",
     "manage_time_clock",
     "update_own_tasks",
     "view_department_tasks"
@@ -47,16 +49,17 @@ const rolePermissions: Record<UserRole, AppPermission[]> = {
     "manage_projects",
     "manage_tasks",
     "view_time_logs",
+    "view_time_cards",
     "manage_time_clock",
     "update_own_tasks",
     "view_department_tasks"
   ],
-  SHOP_LEAD: ["view_shop_floor", "manage_tasks", "update_own_tasks", "view_department_tasks"],
-  SALES: ["view_sales", "update_own_tasks"],
-  DESIGNER: ["view_design", "update_own_tasks"],
-  PURCHASER: ["view_engineering", "update_own_tasks"],
-  DEPARTMENT_USER: ["update_own_tasks"],
-  INSTALLER: ["update_own_tasks"]
+  SHOP_LEAD: ["view_shop_floor", "manage_tasks", "view_time_cards", "update_own_tasks", "view_department_tasks"],
+  SALES: ["view_sales", "view_time_cards", "update_own_tasks"],
+  DESIGNER: ["view_design", "view_time_cards", "update_own_tasks"],
+  PURCHASER: ["view_engineering", "view_time_cards", "update_own_tasks"],
+  DEPARTMENT_USER: ["view_time_cards", "update_own_tasks"],
+  INSTALLER: ["view_time_cards", "update_own_tasks"]
 };
 
 export function hasPermission(user: CurrentUser | null, permission: AppPermission) {
@@ -111,4 +114,12 @@ export function getNavigationItems(user: CurrentUser | null) {
   }
 
   return items.map(({ href, label }) => ({ href, label }));
+}
+
+export function getUtilityNavigationItems(user: CurrentUser | null) {
+  if (!hasPermission(user, "view_time_cards")) {
+    return [];
+  }
+
+  return [{ href: "/time-cards", label: "Time Cards" }];
 }

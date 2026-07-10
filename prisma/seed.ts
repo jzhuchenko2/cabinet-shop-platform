@@ -293,7 +293,7 @@ async function main() {
     }
   });
 
-  await prisma.task.create({
+  const assemblyTask = await prisma.task.create({
     data: {
       projectId: project.id,
       departmentId: constructionDepartment.id,
@@ -441,8 +441,11 @@ async function main() {
     data: {
       organizationId: organization.id,
       userId: employee.id,
+      projectId: project.id,
+      taskId: assemblyTask.id,
       startedAt: new Date("2026-07-08T15:30:00.000Z"),
       source: "MANUAL",
+      notes: "Active demo time card for manager review.",
       verificationNote: "Future verification: shop Wi-Fi, QR/NFC, or geofence proximity."
     }
   });

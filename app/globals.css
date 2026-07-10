@@ -123,6 +123,43 @@ textarea {
   color: #ffffff;
 }
 
+.sidebar-utility-nav {
+  border-top: 1px solid rgba(255, 255, 255, 0.16);
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+  padding-top: 18px;
+}
+
+.time-card-nav-link {
+  align-items: center;
+  background: #fff7e5;
+  border: 1px solid var(--accent);
+  border-radius: 8px;
+  color: var(--charcoal-strong);
+  display: flex;
+  font-weight: 800;
+  gap: 10px;
+  padding: 11px 12px;
+}
+
+.time-card-nav-link:hover {
+  background: #ffffff;
+  color: var(--accent-strong);
+}
+
+.time-card-nav-link span {
+  align-items: center;
+  background: var(--accent);
+  border-radius: 6px;
+  color: #ffffff;
+  display: inline-flex;
+  font-size: 11px;
+  height: 28px;
+  justify-content: center;
+  width: 28px;
+}
+
 .sidebar-user {
   border-top: 1px solid rgba(255, 255, 255, 0.16);
   color: #f3f0eb;
@@ -537,6 +574,32 @@ h3 {
   min-width: 92px;
 }
 
+.time-clock-start-form,
+.time-card-scope-form {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.time-clock-start-form {
+  min-width: 260px;
+}
+
+.time-card-scope-form {
+  grid-template-columns: repeat(3, minmax(120px, 1fr)) auto;
+}
+
+.time-clock-start-form select,
+.time-card-scope-form input,
+.time-card-scope-form select {
+  background: #fffaf3;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  min-width: 0;
+  padding: 8px 10px;
+  width: 100%;
+}
+
 .work-toolbar {
   align-items: center;
   display: flex;
@@ -781,6 +844,10 @@ h3 {
   .inline-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .time-card-scope-form {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 760px) {
@@ -869,5 +936,14 @@ h3 {
 
   .inline-form {
     grid-template-columns: 1fr;
+  }
+
+  .time-card-scope-form {
+    grid-template-columns: 1fr;
+  }
+
+  .time-clock-start-form {
+    min-width: 0;
+    width: 100%;
   }
 }
