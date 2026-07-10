@@ -132,32 +132,19 @@ textarea {
 }
 
 .time-card-nav-link {
-  align-items: center;
   background: #fff7e5;
   border: 1px solid var(--accent);
   border-radius: 8px;
   color: var(--charcoal-strong);
-  display: flex;
   font-weight: 800;
-  gap: 10px;
+  display: block;
   padding: 11px 12px;
+  text-align: center;
 }
 
 .time-card-nav-link:hover {
   background: #ffffff;
   color: var(--accent-strong);
-}
-
-.time-card-nav-link span {
-  align-items: center;
-  background: var(--accent);
-  border-radius: 6px;
-  color: #ffffff;
-  display: inline-flex;
-  font-size: 11px;
-  height: 28px;
-  justify-content: center;
-  width: 28px;
 }
 
 .sidebar-user {
