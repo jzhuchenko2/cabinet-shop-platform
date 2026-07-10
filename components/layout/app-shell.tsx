@@ -1,9 +1,10 @@
 import Link from "next/link";
 import type { CurrentUser } from "@/lib/auth";
-import { getNavigationItems } from "@/lib/rbac";
+import { getNavigationItems, getUtilityNavigationItems } from "@/lib/rbac";
 
 export function AppShell({ children, user }: { children: React.ReactNode; user: CurrentUser | null }) {
   const navItems = getNavigationItems(user);
+  const utilityNavItems = getUtilityNavigationItems(user);
 
   return (
     <div className="app-shell">
@@ -22,6 +23,16 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
             </Link>
           ))}
         </nav>
+        {utilityNavItems.length > 0 ? (
+          <nav className="sidebar-utility-nav" aria-label="Time tracking navigation">
+            {utilityNavItems.map((item) => (
+              <Link className="time-card-nav-link" href={item.href} key={item.href}>
+                <span aria-hidden="true">TC</span>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        ) : null}
         {user ? (
           <div className="sidebar-user">
             <strong>{user.name}</strong>

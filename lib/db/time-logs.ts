@@ -47,12 +47,72 @@ export function listAccessibleTimeLogs(user: CurrentUser) {
   });
 }
 
+export function listTimeCardProjectOptions(user: CurrentUser) {
+  const where = isFullAccess(user)
+    ? { organizationId: user.organizationId }
+    : isDepartmentLead(user)
+      ? {
+          organizationId: user.organizationId,
+          OR: [
+            { currentDepartmentId: user.departmentId ?? "__missing-department__" },
+            { tasks: { some: { departmentId: user.departmentId ?? "__missing-department__" } } }
+          ]
+        }
+      : {
+          organizationId: user.organizationId,
+          tasks: { some: { assigneeId: user.id } }
+        };
+
+  return prisma.project.findMany({
+    where,
+    select: {
+      id: true,
+      name: true,
+      client: {
+        select: { name: true }
+      }
+    },
+    orderBy: [{ status: "asc" }, { name: "asc" }]
+  });
+}
+
+export function listTimeCardTaskOptions(user: CurrentUser) {
+  const where = isFullAccess(user)
+    ? { project: { organizationId: user.organizationId } }
+    : isDepartmentLead(user)
+      ? {
+          project: { organizationId: user.organizationId },
+          departmentId: user.departmentId ?? "__missing-department__"
+        }
+      : {
+          project: { organizationId: user.organizationId },
+          assigneeId: user.id
+        };
+
+  return prisma.task.findMany({
+    where,
+    select: {
+      id: true,
+      title: true,
+      projectId: true,
+      project: {
+        select: { name: true }
+      }
+    },
+    orderBy: [{ project: { name: "asc" } }, { status: "asc" }, { dueDate: "asc" }]
+  });
+}
+
 export async function getUserTimeClockState(user: CurrentUser) {
   const [activeEntry, lastEntry] = await Promise.all([
     prisma.timeClockEntry.findFirst({
       where: {
         userId: user.id,
         endedAt: null
+      },
+      include: {
+        project: true,
+        task: true
       },
       orderBy: { startedAt: "desc" }
     }),
@@ -86,8 +146,37 @@ export function listActiveTimeClockEntries(user: CurrentUser) {
         include: {
           department: true
         }
-      }
+      },
+      project: true,
+      task: true
     },
     orderBy: { startedAt: "asc" }
+  });
+}
+
+export function listCompletedTimeClockEntries(user: CurrentUser) {
+  const where = isFullAccess(user)
+    ? { organizationId: user.organizationId, endedAt: { not: null } }
+    : isDepartmentLead(user)
+      ? {
+          organizationId: user.organizationId,
+          endedAt: { not: null },
+          user: { departmentId: user.departmentId ?? "__missing-department__" }
+        }
+      : { userId: user.id, endedAt: { not: null } };
+
+  return prisma.timeClockEntry.findMany({
+    where,
+    include: {
+      user: {
+        include: {
+          department: true
+        }
+      },
+      project: true,
+      task: true
+    },
+    orderBy: { startedAt: "desc" },
+    take: 50
   });
 }

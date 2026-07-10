@@ -7,6 +7,8 @@ export type LiveTimeClockRow = {
   id: string;
   worker: string;
   department: string;
+  project: string;
+  task: string;
   startedAt: string;
   verification: string;
 };
@@ -72,6 +74,8 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
             <tr>
               <th>Worker</th>
               <th>Department</th>
+              <th>Project</th>
+              <th>Task</th>
               <th>Clocked in</th>
               <th>Elapsed</th>
               <th>Verification</th>
@@ -82,6 +86,8 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
               <tr key={entry.id}>
                 <td data-label="Worker">{entry.worker}</td>
                 <td data-label="Department">{entry.department}</td>
+                <td data-label="Project">{entry.project}</td>
+                <td data-label="Task">{entry.task}</td>
                 <td data-label="Clocked in">{entry.startedAtLabel}</td>
                 <td data-label="Elapsed">{entry.elapsed}</td>
                 <td data-label="Verification">{entry.verification}</td>

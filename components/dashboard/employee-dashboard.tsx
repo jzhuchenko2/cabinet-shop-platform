@@ -3,7 +3,7 @@ import { TimeClockControls } from "@/components/time-logs/time-clock-controls";
 import { PageHeader } from "@/components/ui/page-header";
 import type { CurrentUser } from "@/lib/auth";
 import { listAccessibleTasks } from "@/lib/db/tasks";
-import { getUserTimeClockState } from "@/lib/db/time-logs";
+import { getUserTimeClockState, listTimeCardProjectOptions, listTimeCardTaskOptions } from "@/lib/db/time-logs";
 import { updateTaskStatusAction } from "@/app/(app)/projects/[projectId]/tasks/actions";
 import { clockInAction, clockOutAction } from "@/app/(app)/time-clock/actions";
 
@@ -20,7 +20,23 @@ function formatDueDate(dueDate: Date | null) {
 }
 
 export async function EmployeeDashboard({ user }: { user: CurrentUser }) {
-  const [tasks, timeClockState] = await Promise.all([listAccessibleTasks(user), getUserTimeClockState(user)]);
+  const [tasks, timeClockState, projectOptionsRaw, taskOptionsRaw] = await Promise.all([
+    listAccessibleTasks(user),
+    getUserTimeClockState(user),
+    listTimeCardProjectOptions(user),
+    listTimeCardTaskOptions(user)
+  ]);
+  const projectOptions = projectOptionsRaw.map((project) => ({
+    id: project.id,
+    name: project.name,
+    client: project.client.name
+  }));
+  const taskOptions = taskOptionsRaw.map((task) => ({
+    id: task.id,
+    title: task.title,
+    projectId: task.projectId,
+    projectName: task.project.name
+  }));
   const taskRows = tasks.map((task) => ({
     id: task.id,
     projectId: task.projectId,
@@ -58,13 +74,17 @@ export async function EmployeeDashboard({ user }: { user: CurrentUser }) {
             timeClockState.activeEntry
               ? {
                   id: timeClockState.activeEntry.id,
-                  startedAt: timeClockState.activeEntry.startedAt.toISOString()
+                  startedAt: timeClockState.activeEntry.startedAt.toISOString(),
+                  projectName: timeClockState.activeEntry.project?.name ?? null,
+                  taskTitle: timeClockState.activeEntry.task?.title ?? null
                 }
               : null
           }
           clockInAction={clockInAction}
           clockOutAction={clockOutAction}
           lastClockedOutAt={timeClockState.lastEntry?.endedAt?.toISOString() ?? null}
+          projectOptions={projectOptions}
+          taskOptions={taskOptions}
         />
         <section className="card">
           <p className="eyebrow">Assigned tasks</p>
