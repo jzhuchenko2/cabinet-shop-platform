@@ -22,7 +22,7 @@ The first customer is a small to mid-sized custom cabinet shop that needs better
 - Project status and department stage tracking
 - Task model with department ownership
 - Shop Floor, Sales, Design, and Engineering work views
-- File upload for project documents and images
+- Project PDF upload, metadata editing, deletion, viewing, and download with manager-only write access
 - Dashboard notification bell and side panel for task assignments, project changes, blocked work, file uploads, and other important updates
 - Time logging for tasks or departments
 

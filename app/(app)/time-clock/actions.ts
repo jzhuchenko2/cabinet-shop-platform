@@ -138,6 +138,7 @@ export async function clockOutAction(formData: FormData) {
   }
 
   const entryId = String(formData.get("entryId") ?? "");
+  const scope = await resolveAllowedWorkScope(user, formData);
   const activeEntry = await prisma.timeClockEntry.findFirst({
     where: {
       ...(entryId ? { id: entryId } : {}),
@@ -149,7 +150,10 @@ export async function clockOutAction(formData: FormData) {
   if (activeEntry) {
     await prisma.timeClockEntry.update({
       where: { id: activeEntry.id },
-      data: { endedAt: new Date() }
+      data: {
+        ...scope,
+        endedAt: new Date()
+      }
     });
     await createTimeLogFromEntry(activeEntry.id);
   }

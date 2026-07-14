@@ -1,13 +1,28 @@
 import Link from "next/link";
+import { DashboardAutoRefresh } from "@/components/dashboard/dashboard-auto-refresh";
 import { EmployeeDashboard } from "@/components/dashboard/employee-dashboard";
 import { DashboardNotifications } from "@/components/dashboard/dashboard-notifications";
+import { ProjectStatusChart } from "@/components/dashboard/project-status-chart";
+import { ShopOverviewChart } from "@/components/dashboard/shop-overview-chart";
 import { LiveTimeClockPanel } from "@/components/time-logs/live-time-clock-panel";
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
-import { departmentWorkflow } from "@/lib/constants/workflow";
 import { getCurrentUser } from "@/lib/auth";
+import { listDashboardProjectStatuses } from "@/lib/db/projects";
 import { listActiveTimeClockEntries } from "@/lib/db/time-logs";
 import { isFullAccess } from "@/lib/rbac";
+
+function isDueThisWeek(value: Date | null) {
+  if (!value) {
+    return false;
+  }
+
+  const now = new Date();
+  const weekFromNow = new Date(now);
+  weekFromNow.setDate(now.getDate() + 7);
+
+  return value >= now && value <= weekFromNow;
+}
 
 export default async function DashboardPage() {
   const currentUser = await getCurrentUser();
@@ -16,10 +31,19 @@ export default async function DashboardPage() {
     return <EmployeeDashboard user={currentUser} />;
   }
 
-  const activeTimeEntries = currentUser ? await listActiveTimeClockEntries(currentUser) : [];
+  const [activeTimeEntries, projectStatuses] = currentUser
+    ? await Promise.all([
+        listActiveTimeClockEntries(currentUser),
+        listDashboardProjectStatuses(currentUser.organizationId)
+      ])
+    : [[], []];
+
+  const blockedProjectCount = projectStatuses.filter((project) => project.isBlocked || project.status === "BLOCKED").length;
+  const dueThisWeekCount = projectStatuses.filter((project) => isDueThisWeek(project.dueDate)).length;
 
   return (
     <>
+      <DashboardAutoRefresh />
       <PageHeader
         eyebrow="Shop overview"
         title="Dashboard"
@@ -48,9 +72,9 @@ export default async function DashboardPage() {
       />
 
       <section className="grid grid-3">
-        <StatCard label="Active projects" value="12" detail="Across sales, design, shop, and install" />
-        <StatCard label="Blocked work" value="3" detail="Needs manager attention" />
-        <StatCard label="Due this week" value="18" detail="Tasks and handoffs" />
+        <StatCard label="Active projects" value={projectStatuses.length} detail="Across sales, design, shop, and install" />
+        <StatCard label="Blocked work" value={blockedProjectCount} detail="Needs manager attention" />
+        <StatCard label="Due this week" value={dueThisWeekCount} detail="Project due dates" />
       </section>
 
       <LiveTimeClockPanel
@@ -65,23 +89,9 @@ export default async function DashboardPage() {
         }))}
       />
 
-      <section className="card" style={{ marginTop: 16 }}>
-        <h2>Department flow</h2>
-        <div className="stage-list">
-          {departmentWorkflow.map((stage, index) => (
-            <div className="stage-row" key={stage.key}>
-              <strong>{index + 1}</strong>
-              <div className="stage-main">
-                <span>{stage.name}</span>
-                <span className="stage-deadline">Deadline {stage.deadline}</span>
-              </div>
-              <span className={index === 2 || index === 5 ? "status-pill blocked" : "status-pill ready"}>
-                {index === 2 || index === 5 ? "Needs review" : "Ready"}
-              </span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <ShopOverviewChart projects={projectStatuses} />
+
+      <ProjectStatusChart projects={projectStatuses} />
     </>
   );
 }

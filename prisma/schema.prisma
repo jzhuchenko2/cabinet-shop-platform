@@ -16,6 +16,7 @@ model Organization {
   clients          Client[]
   projects         Project[]
   timeClockEntries TimeClockEntry[]
+  conversations     Conversation[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 }
@@ -39,6 +40,9 @@ model User {
   timeClockEntries TimeClockEntry[]
   uploadedFiles    File[]
   uploadedPhotos   Photo[]
+  chatParticipants ConversationParticipant[]
+  sentChatMessages ChatMessage[]
+  createdConversations Conversation[] @relation("ConversationCreator")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -307,6 +311,54 @@ model Notification {
   @@index([projectId])
 }
 
+model Conversation {
+  id             String            @id @default(cuid())
+  organizationId String
+  organization   Organization      @relation(fields: [organizationId], references: [id])
+  createdById    String?
+  createdBy      User?             @relation("ConversationCreator", fields: [createdById], references: [id])
+
+  title String?
+  type  ConversationType @default(DIRECT)
+
+  participants ConversationParticipant[]
+  messages     ChatMessage[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId, updatedAt])
+  @@index([createdById])
+}
+
+model ConversationParticipant {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  userId         String
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  lastReadAt DateTime?
+  createdAt  DateTime @default(now())
+
+  @@unique([conversationId, userId])
+  @@index([userId])
+}
+
+model ChatMessage {
+  id             String       @id @default(cuid())
+  conversationId String
+  conversation   Conversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+  senderId       String
+  sender         User         @relation(fields: [senderId], references: [id])
+
+  body      String
+  createdAt DateTime @default(now())
+
+  @@index([conversationId, createdAt])
+  @@index([senderId])
+}
+
 model TimeLog {
   id            String       @id @default(cuid())
   userId        String
@@ -458,4 +510,10 @@ enum NotificationType {
   PROJECT_STAGE_CHANGED
   FILE_UPLOADED
   NOTE_ADDED
+  CHAT_MESSAGE
+}
+
+enum ConversationType {
+  DIRECT
+  GROUP
 }

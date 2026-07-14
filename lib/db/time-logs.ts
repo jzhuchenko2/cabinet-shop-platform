@@ -104,7 +104,16 @@ export function listTimeCardTaskOptions(user: CurrentUser) {
 }
 
 export async function getUserTimeClockState(user: CurrentUser) {
-  const [activeEntry, lastEntry] = await Promise.all([
+  const now = new Date();
+  const startOfToday = new Date(now);
+  startOfToday.setHours(0, 0, 0, 0);
+
+  const startOfWeek = new Date(startOfToday);
+  const day = startOfWeek.getDay();
+  const daysSinceMonday = day === 0 ? 6 : day - 1;
+  startOfWeek.setDate(startOfWeek.getDate() - daysSinceMonday);
+
+  const [activeEntry, lastEntry, todayTimeLogs, weekTimeLogs] = await Promise.all([
     prisma.timeClockEntry.findFirst({
       where: {
         userId: user.id,
@@ -122,10 +131,29 @@ export async function getUserTimeClockState(user: CurrentUser) {
         endedAt: { not: null }
       },
       orderBy: { endedAt: "desc" }
+    }),
+    prisma.timeLog.findMany({
+      where: {
+        userId: user.id,
+        workDate: { gte: startOfToday }
+      },
+      select: { minutes: true }
+    }),
+    prisma.timeLog.findMany({
+      where: {
+        userId: user.id,
+        workDate: { gte: startOfWeek }
+      },
+      select: { minutes: true }
     })
   ]);
 
-  return { activeEntry, lastEntry };
+  return {
+    activeEntry,
+    lastEntry,
+    todayLoggedMinutes: todayTimeLogs.reduce((total, log) => total + log.minutes, 0),
+    weekLoggedMinutes: weekTimeLogs.reduce((total, log) => total + log.minutes, 0)
+  };
 }
 
 export function listActiveTimeClockEntries(user: CurrentUser) {

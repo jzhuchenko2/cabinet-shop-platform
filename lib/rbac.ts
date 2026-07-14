@@ -4,6 +4,8 @@ import type { CurrentUser } from "@/lib/auth";
 export type AppPermission =
   | "view_full_dashboard"
   | "view_all_projects"
+  | "view_calendar"
+  | "view_chats"
   | "view_clients"
   | "view_sales"
   | "view_design"
@@ -14,6 +16,8 @@ export type AppPermission =
   | "view_time_logs"
   | "view_time_cards"
   | "manage_time_clock"
+  | "manage_project_files"
+  | "view_settings"
   | "update_own_tasks"
   | "view_department_tasks";
 
@@ -25,6 +29,8 @@ const rolePermissions: Record<UserRole, AppPermission[]> = {
   OWNER_ADMIN: [
     "view_full_dashboard",
     "view_all_projects",
+    "view_calendar",
+    "view_chats",
     "view_clients",
     "view_sales",
     "view_design",
@@ -35,12 +41,16 @@ const rolePermissions: Record<UserRole, AppPermission[]> = {
     "view_time_logs",
     "view_time_cards",
     "manage_time_clock",
+    "manage_project_files",
+    "view_settings",
     "update_own_tasks",
     "view_department_tasks"
   ],
   MANAGER: [
     "view_full_dashboard",
     "view_all_projects",
+    "view_calendar",
+    "view_chats",
     "view_clients",
     "view_sales",
     "view_design",
@@ -51,15 +61,17 @@ const rolePermissions: Record<UserRole, AppPermission[]> = {
     "view_time_logs",
     "view_time_cards",
     "manage_time_clock",
+    "manage_project_files",
+    "view_settings",
     "update_own_tasks",
     "view_department_tasks"
   ],
-  SHOP_LEAD: ["view_shop_floor", "manage_tasks", "view_time_cards", "update_own_tasks", "view_department_tasks"],
-  SALES: ["view_sales", "view_time_cards", "update_own_tasks"],
-  DESIGNER: ["view_design", "view_time_cards", "update_own_tasks"],
-  PURCHASER: ["view_engineering", "view_time_cards", "update_own_tasks"],
-  DEPARTMENT_USER: ["view_time_cards", "update_own_tasks"],
-  INSTALLER: ["view_time_cards", "update_own_tasks"]
+  SHOP_LEAD: ["view_calendar", "view_chats", "view_shop_floor", "manage_tasks", "view_time_cards", "update_own_tasks", "view_department_tasks"],
+  SALES: ["view_calendar", "view_chats", "view_sales", "view_time_cards", "update_own_tasks"],
+  DESIGNER: ["view_calendar", "view_chats", "view_design", "view_time_cards", "update_own_tasks"],
+  PURCHASER: ["view_calendar", "view_chats", "view_engineering", "view_time_cards", "update_own_tasks"],
+  DEPARTMENT_USER: ["view_calendar", "view_chats", "view_time_cards", "update_own_tasks"],
+  INSTALLER: ["view_calendar", "view_chats", "view_time_cards", "update_own_tasks"]
 };
 
 export function hasPermission(user: CurrentUser | null, permission: AppPermission) {
@@ -117,9 +129,23 @@ export function getNavigationItems(user: CurrentUser | null) {
 }
 
 export function getUtilityNavigationItems(user: CurrentUser | null) {
-  if (!hasPermission(user, "view_time_cards")) {
-    return [];
+  const items: { href: string; label: string; icon: "calendar" | "chat" | "clock" | "settings" }[] = [];
+
+  if (hasPermission(user, "view_chats")) {
+    items.push({ href: "/chats", label: "Chats", icon: "chat" });
   }
 
-  return [{ href: "/time-cards", label: "Time Cards" }];
+  if (hasPermission(user, "view_calendar")) {
+    items.push({ href: "/calendar", label: "Calendar", icon: "calendar" });
+  }
+
+  if (hasPermission(user, "view_time_cards")) {
+    items.push({ href: "/time-cards", label: "Time Cards", icon: "clock" });
+  }
+
+  if (hasPermission(user, "view_settings")) {
+    items.push({ href: "/settings", label: "Settings", icon: "settings" });
+  }
+
+  return items;
 }

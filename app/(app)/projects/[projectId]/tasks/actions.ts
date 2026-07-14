@@ -68,6 +68,7 @@ export async function createTaskAction(
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/projects/${projectId}/tasks`);
+  revalidatePath("/dashboard");
   revalidatePath("/shop-floor");
   return {};
 }
@@ -93,5 +94,6 @@ export async function updateTaskStatusAction(projectId: string, formData: FormDa
 
   revalidatePath(`/projects/${projectId}`);
   revalidatePath(`/projects/${projectId}/tasks`);
+  revalidatePath("/dashboard");
   revalidatePath("/shop-floor");
 }

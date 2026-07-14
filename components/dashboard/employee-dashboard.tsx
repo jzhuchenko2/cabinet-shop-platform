@@ -75,8 +75,11 @@ export async function EmployeeDashboard({ user }: { user: CurrentUser }) {
               ? {
                   id: timeClockState.activeEntry.id,
                   startedAt: timeClockState.activeEntry.startedAt.toISOString(),
+                  projectId: timeClockState.activeEntry.projectId ?? "",
                   projectName: timeClockState.activeEntry.project?.name ?? null,
-                  taskTitle: timeClockState.activeEntry.task?.title ?? null
+                  taskId: timeClockState.activeEntry.taskId ?? "",
+                  taskTitle: timeClockState.activeEntry.task?.title ?? null,
+                  notes: timeClockState.activeEntry.notes ?? ""
                 }
               : null
           }
@@ -85,6 +88,9 @@ export async function EmployeeDashboard({ user }: { user: CurrentUser }) {
           lastClockedOutAt={timeClockState.lastEntry?.endedAt?.toISOString() ?? null}
           projectOptions={projectOptions}
           taskOptions={taskOptions}
+          todayLoggedMinutes={timeClockState.todayLoggedMinutes}
+          userName={user.name}
+          weekLoggedMinutes={timeClockState.weekLoggedMinutes}
         />
         <section className="card">
           <p className="eyebrow">Assigned tasks</p>
