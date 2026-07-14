@@ -31,3 +31,8 @@ The platform should model the real department flow of a cabinet shop. Each proje
 - Handoffs should be visible to the next department.
 - Engineering and finish review steps should preserve history.
 - The system should make it easy to see what is ready, waiting, blocked, or complete.
+- The dashboard should show each active project as a status row, with department blocks indicating completed work, work needing effort, and upcoming stages.
+- The manager dashboard should show a combined shop-flow chart above individual project rows so managers can scan overall shop health first.
+- The live time clock should start as a compact dashboard summary and expand into details only when clicked.
+- Task status changes revalidate the dashboard project chart, and the manager dashboard refreshes while open so department flow rows stay current during shop updates.
+- Department steps show logged hours from project time logs grouped by department.

@@ -20,6 +20,8 @@ The target stack is:
 
 The initial scaffold now includes route groups for auth and the main app, reusable layout/UI components, workflow constants, database helper modules, a Prisma schema, and a seed script for the first MVP vertical slice.
 
+Project PDF files are stored in Supabase Storage using the `SUPABASE_PROJECT_FILES_BUCKET` bucket. File metadata stays in Prisma, managers and owner/admins can create/update/delete PDFs, and project-scoped users receive short-lived signed preview and download links after server-side access checks.
+
 ## Early Data Model Direction
 
 The first schema includes:

@@ -1,8 +1,7 @@
 import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
 import { TimeClockControls } from "@/components/time-logs/time-clock-controls";
-import { TimeCardScopeForm } from "@/components/time-logs/time-card-scope-form";
-import { TimeCardStopButton } from "@/components/time-logs/time-card-stop-button";
+import { TimeCardWorkspaceModal } from "@/components/time-logs/time-card-workspace-modal";
 import { getCurrentUser } from "@/lib/auth";
 import {
   getUserTimeClockState,
@@ -67,6 +66,35 @@ export default async function TimeCardsPage() {
     projectId: task.projectId,
     projectName: task.project.name
   }));
+  const activeEntryRows = activeEntries.map((entry) => ({
+    id: entry.id,
+    userId: entry.userId,
+    employee: entry.user.name,
+    startedAt: formatDateTime(entry.startedAt),
+    elapsed: formatMinutes(elapsedMinutes(entry.startedAt, entry.endedAt)),
+    projectId: entry.projectId ?? "",
+    taskId: entry.taskId ?? "",
+    notes: entry.notes ?? ""
+  }));
+  const completedEntryRows = completedEntries.map((entry) => ({
+    id: entry.id,
+    employee: entry.user.name,
+    project: entry.project?.name ?? "General shop time",
+    task: entry.task?.title ?? "No task selected",
+    startedAt: formatDateTime(entry.startedAt),
+    endedAt: entry.endedAt ? formatDateTime(entry.endedAt) : "Active",
+    total: formatMinutes(elapsedMinutes(entry.startedAt, entry.endedAt))
+  }));
+  const timeLogRows = timeLogs.map((log) => ({
+    id: log.id,
+    employee: log.user.name,
+    project: log.project.name,
+    task: log.task?.title ?? "No task selected",
+    total: formatMinutes(log.minutes),
+    totalMinutes: log.minutes,
+    workDate: formatDateTime(log.workDate),
+    notes: log.notes ?? ""
+  }));
 
   return (
     <>
@@ -87,8 +115,11 @@ export default async function TimeCardsPage() {
               ? {
                   id: userClockState.activeEntry.id,
                   startedAt: userClockState.activeEntry.startedAt.toISOString(),
+                  projectId: userClockState.activeEntry.projectId ?? "",
                   projectName: userClockState.activeEntry.project?.name ?? null,
-                  taskTitle: userClockState.activeEntry.task?.title ?? null
+                  taskId: userClockState.activeEntry.taskId ?? "",
+                  taskTitle: userClockState.activeEntry.task?.title ?? null,
+                  notes: userClockState.activeEntry.notes ?? ""
                 }
               : null
           }
@@ -97,121 +128,22 @@ export default async function TimeCardsPage() {
           lastClockedOutAt={userClockState.lastEntry?.endedAt?.toISOString() ?? null}
           projectOptions={projectOptions}
           taskOptions={taskOptions}
+          todayLoggedMinutes={userClockState.todayLoggedMinutes}
+          userName={currentUser.name}
+          weekLoggedMinutes={userClockState.weekLoggedMinutes}
         />
       ) : null}
 
-      <section className="card work-section">
-        <div className="section-heading-row">
-          <div>
-            <p className="eyebrow">Live</p>
-            <h2>{activeEntries.length} active time cards</h2>
-          </div>
-        </div>
-        {activeEntries.length > 0 ? (
-          <table className="table responsive-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Started</th>
-                <th>Elapsed</th>
-                <th>Work scope</th>
-                <th>Manage</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activeEntries.map((entry) => (
-                <tr key={entry.id}>
-                  <td data-label="Employee">{entry.user.name}</td>
-                  <td data-label="Started">{formatDateTime(entry.startedAt)}</td>
-                  <td data-label="Elapsed">{formatMinutes(elapsedMinutes(entry.startedAt, entry.endedAt))}</td>
-                  <td data-label="Work scope">
-                    <TimeCardScopeForm
-                      action={updateTimeCardScopeAction}
-                      entryId={entry.id}
-                      notes={entry.notes ?? ""}
-                      projectId={entry.projectId ?? ""}
-                      projectOptions={projectOptions}
-                      taskId={entry.taskId ?? ""}
-                      taskOptions={taskOptions}
-                    />
-                  </td>
-                  <td data-label="Manage">
-                    {(canManageTimeCards || entry.userId === currentUser.id) ? (
-                      <TimeCardStopButton action={stopTimeCardAction} entryId={entry.id} />
-                    ) : null}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="muted">No one is clocked in right now.</p>
-        )}
-      </section>
-
-      <section className="card work-section">
-        <h2>Completed clock sessions</h2>
-        {completedEntries.length > 0 ? (
-          <table className="table responsive-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Project</th>
-                <th>Task</th>
-                <th>Started</th>
-                <th>Ended</th>
-                <th>Total</th>
-              </tr>
-            </thead>
-            <tbody>
-              {completedEntries.map((entry) => (
-                <tr key={entry.id}>
-                  <td data-label="Employee">{entry.user.name}</td>
-                  <td data-label="Project">{entry.project?.name ?? "General shop time"}</td>
-                  <td data-label="Task">{entry.task?.title ?? "No task selected"}</td>
-                  <td data-label="Started">{formatDateTime(entry.startedAt)}</td>
-                  <td data-label="Ended">{entry.endedAt ? formatDateTime(entry.endedAt) : "Active"}</td>
-                  <td data-label="Total">{formatMinutes(elapsedMinutes(entry.startedAt, entry.endedAt))}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="muted">No completed clock sessions yet.</p>
-        )}
-      </section>
-
-      <section className="card work-section">
-        <h2>Project time logs</h2>
-        {timeLogs.length > 0 ? (
-          <table className="table responsive-table">
-            <thead>
-              <tr>
-                <th>Employee</th>
-                <th>Project</th>
-                <th>Task</th>
-                <th>Minutes</th>
-                <th>Work date</th>
-                <th>Notes</th>
-              </tr>
-            </thead>
-            <tbody>
-              {timeLogs.map((log) => (
-                <tr key={log.id}>
-                  <td data-label="Employee">{log.user.name}</td>
-                  <td data-label="Project">{log.project.name}</td>
-                  <td data-label="Task">{log.task?.title ?? "No task selected"}</td>
-                  <td data-label="Minutes">{log.minutes}</td>
-                  <td data-label="Work date">{formatDateTime(log.workDate)}</td>
-                  <td data-label="Notes">{log.notes ?? ""}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        ) : (
-          <p className="muted">No project time logs have been recorded yet.</p>
-        )}
-      </section>
+      <TimeCardWorkspaceModal
+        activeEntries={activeEntryRows}
+        canManageTimeCards={canManageTimeCards}
+        completedEntries={completedEntryRows}
+        projectOptions={projectOptions}
+        stopAction={stopTimeCardAction}
+        taskOptions={taskOptions}
+        timeLogs={timeLogRows}
+        updateScopeAction={updateTimeCardScopeAction}
+      />
     </>
   );
 }

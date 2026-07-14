@@ -40,6 +40,30 @@ export function listAccessibleProjects(user: CurrentUser) {
   });
 }
 
+export function listDashboardProjectStatuses(organizationId: string) {
+  return prisma.project.findMany({
+    where: {
+      organizationId,
+      status: { in: ["LEAD", "ACTIVE", "ON_HOLD", "BLOCKED"] }
+    },
+    include: {
+      client: true,
+      currentDepartment: true,
+      tasks: {
+        include: {
+          department: true
+        }
+      },
+      timeLogs: {
+        include: {
+          department: true
+        }
+      }
+    },
+    orderBy: [{ isBlocked: "desc" }, { dueDate: "asc" }, { updatedAt: "desc" }]
+  });
+}
+
 export async function canAccessProject(projectId: string, user: CurrentUser) {
   const project = await prisma.project.findFirst({
     where: {
