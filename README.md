@@ -1,6 +1,6 @@
 # Cabinet Shop Platform
 
-A cabinet shop operating system for managing custom cabinet projects from first sales conversation through install and closeout.
+A cabinet shop operating system for managing custom cabinet projects from first sales conversation through delivery, install, and closeout.
 
 ## What It Is
 
