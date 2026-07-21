@@ -22,6 +22,8 @@ The initial scaffold now includes route groups for auth and the main app, reusab
 
 Project PDF files are stored in Supabase Storage using the `SUPABASE_PROJECT_FILES_BUCKET` bucket. File metadata stays in Prisma, managers and owner/admins can create/update/delete PDFs, and project-scoped users receive short-lived signed preview and download links after server-side access checks. The server ensures the private bucket exists before upload, export, preview, download, or delete operations, so production only needs valid Supabase URL/service-role environment variables. Clicking a project file name or thumbnail opens an in-platform PDF viewer by default; Download remains a separate explicit action. Managers can edit file display name/type from the viewer and use the PDF markup layer for pen, highlight, box, arrow, text notes, page rotation, page deletion, editable annotation saves, and exported marked-up PDF revisions. Employees can view saved markups and download files, but cannot save annotations or create revisions.
 
+The calendar combines automatic project/task dates with manual calendar events. Project due dates, install dates, and task due dates are derived from Prisma project/task records for every signed-in role with calendar access. Manual `CalendarEvent` records support personal or company visibility, optional project association, event type, notes, color, and start/end times. Owners/admins and managers can create or edit company events and customize colors; non-manager roles can create and edit their own personal events while still viewing company and project-based schedule layers.
+
 ## Early Data Model Direction
 
 The first schema includes:

@@ -23,6 +23,7 @@ The first customer is a small to mid-sized custom cabinet shop that needs better
 - Task model with department ownership
 - Shop Floor, Sales, Design, and Engineering work views
 - Project PDF upload, metadata editing, deletion, viewing, and download with manager-only write access
+- Shared calendar with personal, company, and project-based layers for events, installs, project due dates, and task due dates
 - Dashboard notification bell and side panel for task assignments, project changes, blocked work, file uploads, and other important updates
 - Time logging for tasks or departments
 

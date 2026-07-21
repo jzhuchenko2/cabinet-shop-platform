@@ -17,6 +17,7 @@ model Organization {
   projects         Project[]
   timeClockEntries TimeClockEntry[]
   conversations     Conversation[]
+  calendarEvents  CalendarEvent[]
   createdAt        DateTime         @default(now())
   updatedAt        DateTime         @updatedAt
 }
@@ -44,6 +45,7 @@ model User {
   chatParticipants ConversationParticipant[]
   sentChatMessages ChatMessage[]
   createdConversations Conversation[] @relation("ConversationCreator")
+  calendarEvents CalendarEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -117,6 +119,7 @@ model Project {
   notifications    Notification[]
   timeLogs         TimeLog[]
   timeClockEntries TimeClockEntry[]
+  calendarEvents   CalendarEvent[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -371,6 +374,31 @@ model ChatMessage {
   @@index([senderId])
 }
 
+model CalendarEvent {
+  id             String                  @id @default(cuid())
+  organizationId String
+  organization   Organization            @relation(fields: [organizationId], references: [id])
+  createdById    String
+  createdBy      User                    @relation(fields: [createdById], references: [id])
+  projectId      String?
+  project        Project?                @relation(fields: [projectId], references: [id], onDelete: SetNull)
+
+  title       String
+  description String?
+  eventType   CalendarEventType          @default(GENERAL)
+  visibility  CalendarEventVisibility    @default(PERSONAL)
+  startsAt    DateTime
+  endsAt      DateTime?
+  color       String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([organizationId, startsAt])
+  @@index([createdById, startsAt])
+  @@index([projectId, startsAt])
+}
+
 model TimeLog {
   id            String       @id @default(cuid())
   userId        String
@@ -528,4 +556,17 @@ enum NotificationType {
 enum ConversationType {
   DIRECT
   GROUP
+}
+
+enum CalendarEventVisibility {
+  PERSONAL
+  COMPANY
+}
+
+enum CalendarEventType {
+  GENERAL
+  MEETING
+  DELIVERY
+  INSTALL
+  DEADLINE
 }
