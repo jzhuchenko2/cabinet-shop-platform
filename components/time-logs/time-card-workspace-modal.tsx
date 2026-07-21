@@ -168,7 +168,9 @@ export function TimeCardWorkspaceModal({
                             />
                           </td>
                           <td data-label="Manage">
-                            {canManageTimeCards ? <TimeCardStopButton action={stopAction} entryId={entry.id} /> : null}
+                            {canManageTimeCards ? (
+                              <TimeCardStopButton action={stopAction} canStop={Boolean(entry.projectId && entry.taskId)} entryId={entry.id} />
+                            ) : null}
                           </td>
                         </tr>
                       ))}

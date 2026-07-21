@@ -12,13 +12,27 @@ function StopButton() {
   );
 }
 
+function DisabledStopButton() {
+  return (
+    <button className="button" disabled title="Select a project and task before clocking out." type="button">
+      Add scope first
+    </button>
+  );
+}
+
 export function TimeCardStopButton({
   action,
+  canStop,
   entryId
 }: {
   action: (formData: FormData) => Promise<void>;
+  canStop: boolean;
   entryId: string;
 }) {
+  if (!canStop) {
+    return <DisabledStopButton />;
+  }
+
   return (
     <form action={action}>
       <input name="entryId" type="hidden" value={entryId} />

@@ -36,6 +36,7 @@ export default async function ProjectTimePage({ params }: { params: { projectId:
             user: log.user.name,
             department: log.department?.name ?? "Unassigned",
             minutes: log.minutes,
+            task: log.task?.title ?? "Task not recorded",
             workDate: formatWorkDate(log.workDate),
             notes: log.notes ?? ""
           }))}

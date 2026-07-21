@@ -10,9 +10,17 @@ function optionalString(value: FormDataEntryValue | null) {
   return text || null;
 }
 
-async function resolveAllowedWorkScope(user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>, formData: FormData) {
+async function resolveAllowedWorkScope(
+  user: NonNullable<Awaited<ReturnType<typeof getCurrentUser>>>,
+  formData: FormData,
+  options: { requireProjectAndTask?: boolean } = {}
+) {
   let projectId = optionalString(formData.get("projectId"));
   const taskId = optionalString(formData.get("taskId"));
+
+  if (options.requireProjectAndTask && (!projectId || !taskId)) {
+    throw new Error("Project and task are required before clocking out.");
+  }
 
   if (taskId) {
     const task = await prisma.task.findFirst({
@@ -75,7 +83,7 @@ async function createTimeLogFromEntry(entryId: string) {
     }
   });
 
-  if (!entry?.endedAt || !entry.projectId) {
+  if (!entry?.endedAt || !entry.projectId || !entry.taskId) {
     return;
   }
 
@@ -138,7 +146,7 @@ export async function clockOutAction(formData: FormData) {
   }
 
   const entryId = String(formData.get("entryId") ?? "");
-  const scope = await resolveAllowedWorkScope(user, formData);
+  const scope = await resolveAllowedWorkScope(user, formData, { requireProjectAndTask: true });
   const activeEntry = await prisma.timeClockEntry.findFirst({
     where: {
       ...(entryId ? { id: entryId } : {}),
@@ -170,7 +178,7 @@ export async function updateTimeCardScopeAction(formData: FormData) {
   }
 
   const entryId = String(formData.get("entryId") ?? "");
-  const scope = await resolveAllowedWorkScope(user, formData);
+  const scope = await resolveAllowedWorkScope(user, formData, { requireProjectAndTask: true });
   const entry = await prisma.timeClockEntry.findFirst({
     where: {
       id: entryId,
@@ -212,6 +220,10 @@ export async function stopTimeCardAction(formData: FormData) {
 
   if (!entry) {
     throw new Error("You cannot stop that time card.");
+  }
+
+  if (!entry.projectId || !entry.taskId) {
+    throw new Error("Project and task are required before clocking out.");
   }
 
   await prisma.timeClockEntry.update({

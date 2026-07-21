@@ -541,6 +541,30 @@ h3 {
   font-weight: 700;
 }
 
+.time-log-summary {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(180px, 1fr));
+}
+
+.time-log-summary div {
+  background: #fffaf3;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 6px;
+  padding: 14px;
+}
+
+.time-log-summary span,
+.time-log-summary strong {
+  display: block;
+}
+
+.time-log-summary strong {
+  font-size: 24px;
+}
+
 .live-clock-compact {
   cursor: pointer;
   margin-top: 16px;
@@ -1785,8 +1809,49 @@ h3 {
   grid-template-columns: 76px minmax(0, 1fr);
 }
 
-.file-name-cell strong {
+.file-name-cell strong,
+.file-name-cell span {
+  display: block;
   overflow-wrap: anywhere;
+}
+
+.file-preview-button,
+.file-name-button {
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-align: left;
+}
+
+.file-preview-button:hover .file-preview,
+.file-preview-button:focus-visible .file-preview {
+  border-color: var(--accent);
+  box-shadow: 0 8px 18px rgba(32, 33, 39, 0.12);
+}
+
+.file-preview-button:focus-visible,
+.file-name-button:focus-visible {
+  border-radius: 6px;
+  box-shadow: 0 0 0 3px var(--focus);
+  outline: 0;
+}
+
+.file-name-button {
+  display: grid;
+  gap: 3px;
+}
+
+.file-name-button:hover strong {
+  color: var(--accent-strong);
+}
+
+.file-name-button span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
 }
 
 .file-preview {
@@ -1836,6 +1901,69 @@ h3 {
   min-width: 0;
   padding: 8px 10px;
   width: 100%;
+}
+
+.file-viewer-modal {
+  display: grid;
+  gap: 14px;
+  height: min(880px, calc(100vh - 48px));
+  max-height: calc(100vh - 48px);
+  padding: 18px;
+  width: min(1440px, calc(100vw - 48px));
+}
+
+.file-viewer-toolbar {
+  align-items: flex-start;
+  display: flex;
+  gap: 16px;
+  justify-content: space-between;
+}
+
+.file-viewer-toolbar h2 {
+  margin-bottom: 5px;
+  overflow-wrap: anywhere;
+}
+
+.file-viewer-actions {
+  align-items: center;
+  display: flex;
+  flex-shrink: 0;
+  gap: 10px;
+}
+
+.file-viewer-grid {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) 320px;
+  min-height: 0;
+}
+
+.file-viewer-grid.full {
+  grid-template-columns: 1fr;
+}
+
+.file-viewer-frame {
+  background: #f6f3ed;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  height: 100%;
+  min-height: 560px;
+  width: 100%;
+}
+
+.file-viewer-details {
+  background: #fffaf3;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  align-self: stretch;
+  display: grid;
+  gap: 12px;
+  align-content: start;
+  padding: 14px;
+}
+
+.file-viewer-details .form {
+  max-width: none;
 }
 
 .field {
@@ -2012,6 +2140,18 @@ h3 {
     grid-template-columns: 1fr;
   }
 
+  .file-viewer-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .file-viewer-modal {
+    width: min(100%, calc(100vw - 32px));
+  }
+
+  .file-viewer-frame {
+    min-height: 520px;
+  }
+
   .file-actions {
     min-width: 0;
   }
@@ -2149,6 +2289,24 @@ h3 {
   }
 
   .time-card-hub-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .file-viewer-toolbar,
+  .file-viewer-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .file-viewer-actions .button {
+    width: 100%;
+  }
+
+  .file-viewer-frame {
+    min-height: 420px;
+  }
+
+  .time-log-summary {
     grid-template-columns: 1fr;
   }
 
