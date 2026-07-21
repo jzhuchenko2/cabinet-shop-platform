@@ -4,8 +4,15 @@ import { PageHeader } from "@/components/ui/page-header";
 import { getCurrentUser } from "@/lib/auth";
 import { listProjectFiles } from "@/lib/db/files";
 import { canAccessProject } from "@/lib/db/projects";
+import { parsePdfDeletedPagesJson, parsePdfMarkupJson, parsePdfPageRotationsJson } from "@/lib/pdf-markup";
 import { hasPermission } from "@/lib/rbac";
-import { deleteProjectFileAction, updateProjectFileAction, uploadProjectFileAction } from "./actions";
+import {
+  deleteProjectFileAction,
+  exportProjectFileMarkupAction,
+  saveProjectFileMarkupAction,
+  updateProjectFileAction,
+  uploadProjectFileAction
+} from "./actions";
 
 export const dynamic = "force-dynamic";
 
@@ -38,6 +45,12 @@ function formatFileSize(value: number | null) {
   return `${Math.round((value / (1024 * 1024)) * 10) / 10} MB`;
 }
 
+type FileMarkupFields = {
+  markupJson?: unknown;
+  pageRotations?: unknown;
+  deletedPages?: unknown;
+};
+
 export default async function ProjectFilesPage({ params }: { params: { projectId: string } }) {
   const currentUser = await getCurrentUser();
 
@@ -50,6 +63,8 @@ export default async function ProjectFilesPage({ params }: { params: { projectId
   const uploadAction = uploadProjectFileAction.bind(null, params.projectId);
   const updateAction = updateProjectFileAction.bind(null, params.projectId);
   const deleteAction = deleteProjectFileAction.bind(null, params.projectId);
+  const saveMarkupAction = saveProjectFileMarkupAction.bind(null, params.projectId);
+  const exportMarkupAction = exportProjectFileMarkupAction.bind(null, params.projectId);
 
   return (
     <>
@@ -65,17 +80,26 @@ export default async function ProjectFilesPage({ params }: { params: { projectId
       <ProjectFileManager
         canManageFiles={canManageFiles}
         deleteAction={deleteAction}
-        files={projectFiles.map((file) => ({
-          id: file.id,
-          name: file.name,
-          type: file.fileType,
-          uploadedBy: file.uploadedBy.name,
-          uploadedAt: formatDate(file.createdAt),
-          size: formatFileSize(file.sizeBytes),
-          previewHref: `/projects/${params.projectId}/files/${file.id}/preview`,
-          downloadHref: `/projects/${params.projectId}/files/${file.id}/download`
-        }))}
+        files={projectFiles.map((file) => {
+          const markupFields = file as typeof file & FileMarkupFields;
+
+          return {
+            id: file.id,
+            name: file.name,
+            type: file.fileType,
+            uploadedBy: file.uploadedBy.name,
+            uploadedAt: formatDate(file.createdAt),
+            size: formatFileSize(file.sizeBytes),
+            previewHref: `/projects/${params.projectId}/files/${file.id}/preview`,
+            downloadHref: `/projects/${params.projectId}/files/${file.id}/download`,
+            markupJson: parsePdfMarkupJson(markupFields.markupJson ?? { annotations: [] }),
+            pageRotations: parsePdfPageRotationsJson(markupFields.pageRotations ?? {}),
+            deletedPages: parsePdfDeletedPagesJson(markupFields.deletedPages ?? [])
+          };
+        })}
         fileTypes={fileTypes}
+        exportMarkupAction={exportMarkupAction}
+        saveMarkupAction={saveMarkupAction}
         updateAction={updateAction}
         uploadAction={uploadAction}
       />

@@ -2,7 +2,9 @@
 
 import { useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
-import type { ProjectFileActionState } from "@/app/(app)/projects/[projectId]/files/actions";
+import type { ProjectFileActionState, ProjectFileMarkupActionState } from "@/app/(app)/projects/[projectId]/files/actions";
+import { PdfMarkupEditor } from "@/components/files/pdf-markup-editor";
+import type { PdfDeletedPages, PdfMarkupDocument, PdfPageRotations } from "@/lib/pdf-markup";
 
 export type ProjectFileRow = {
   id: string;
@@ -13,6 +15,9 @@ export type ProjectFileRow = {
   size: string;
   previewHref: string;
   downloadHref: string;
+  markupJson: PdfMarkupDocument;
+  pageRotations: PdfPageRotations;
+  deletedPages: PdfDeletedPages;
 };
 
 export type ProjectFileTypeOption = {
@@ -46,7 +51,9 @@ export function ProjectFileManager({
   canManageFiles,
   uploadAction,
   updateAction,
-  deleteAction
+  deleteAction,
+  saveMarkupAction,
+  exportMarkupAction
 }: {
   files: ProjectFileRow[];
   fileTypes: ProjectFileTypeOption[];
@@ -54,6 +61,8 @@ export function ProjectFileManager({
   uploadAction: (state: ProjectFileActionState, formData: FormData) => Promise<ProjectFileActionState>;
   updateAction: (formData: FormData) => Promise<void>;
   deleteAction: (formData: FormData) => Promise<void>;
+  saveMarkupAction: (state: ProjectFileMarkupActionState, formData: FormData) => Promise<ProjectFileMarkupActionState>;
+  exportMarkupAction: (state: ProjectFileMarkupActionState, formData: FormData) => Promise<ProjectFileMarkupActionState>;
 }) {
   const [uploadState, uploadFormAction] = useFormState(uploadAction, {});
   const [selectedFile, setSelectedFile] = useState<ProjectFileRow | null>(null);
@@ -185,7 +194,19 @@ export function ProjectFileManager({
             </div>
 
             <div className={canManageFiles ? "file-viewer-grid" : "file-viewer-grid full"}>
-              <iframe className="file-viewer-frame" src={selectedFile.previewHref} title={selectedFile.name} />
+              <PdfMarkupEditor
+                canManageFiles={canManageFiles}
+                exportMarkupAction={exportMarkupAction}
+                file={{
+                  id: selectedFile.id,
+                  name: selectedFile.name,
+                  previewHref: selectedFile.previewHref,
+                  markupJson: selectedFile.markupJson,
+                  pageRotations: selectedFile.pageRotations,
+                  deletedPages: selectedFile.deletedPages
+                }}
+                saveMarkupAction={saveMarkupAction}
+              />
 
               {canManageFiles ? (
                 <aside className="file-viewer-details">
