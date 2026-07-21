@@ -17,3 +17,26 @@ export function getSupabaseAdminClient() {
     }
   });
 }
+
+export async function ensureProjectFilesBucket() {
+  const supabase = getSupabaseAdminClient();
+  const { error: getBucketError } = await supabase.storage.getBucket(projectFilesBucket);
+
+  if (!getBucketError) {
+    return;
+  }
+
+  if (!/not found/i.test(getBucketError.message)) {
+    throw new Error(getBucketError.message);
+  }
+
+  const { error: createBucketError } = await supabase.storage.createBucket(projectFilesBucket, {
+    allowedMimeTypes: ["application/pdf"],
+    fileSizeLimit: "25MB",
+    public: false
+  });
+
+  if (createBucketError && !/already exists/i.test(createBucketError.message)) {
+    throw new Error(createBucketError.message);
+  }
+}

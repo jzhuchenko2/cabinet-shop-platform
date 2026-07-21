@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getCurrentUser } from "@/lib/auth";
 import { getProjectFile } from "@/lib/db/files";
 import { canAccessProject } from "@/lib/db/projects";
-import { getSupabaseAdminClient, projectFilesBucket } from "@/lib/supabase-admin";
+import { ensureProjectFilesBucket, getSupabaseAdminClient, projectFilesBucket } from "@/lib/supabase-admin";
 
 export async function GET(_request: Request, { params }: { params: { projectId: string; fileId: string } }) {
   const currentUser = await getCurrentUser();
@@ -21,6 +21,7 @@ export async function GET(_request: Request, { params }: { params: { projectId: 
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  await ensureProjectFilesBucket();
   const supabase = getSupabaseAdminClient();
   const { data, error } = await supabase.storage.from(projectFilesBucket).createSignedUrl(file.storagePath, 60);
 

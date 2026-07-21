@@ -16,7 +16,7 @@ import {
   type PdfPageRotations
 } from "@/lib/pdf-markup";
 import { hasPermission } from "@/lib/rbac";
-import { getSupabaseAdminClient, projectFilesBucket } from "@/lib/supabase-admin";
+import { ensureProjectFilesBucket, getSupabaseAdminClient, projectFilesBucket } from "@/lib/supabase-admin";
 import { requiredString } from "@/lib/validations/common";
 
 export type ProjectFileActionState = {
@@ -272,6 +272,7 @@ export async function exportProjectFileMarkupAction(
       throw new Error("You cannot export files outside your organization.");
     }
 
+    await ensureProjectFilesBucket();
     const supabase = getSupabaseAdminClient();
     const { data, error } = await supabase.storage.from(projectFilesBucket).download(file.storagePath);
 
@@ -372,6 +373,7 @@ export async function uploadProjectFileAction(
     const storageName = cleanFileName(fallbackName.toLowerCase().endsWith(".pdf") ? fallbackName : displayName);
     uploadedPath = `organizations/${currentUser.organizationId}/projects/${projectId}/files/${crypto.randomUUID()}-${storageName}`;
 
+    await ensureProjectFilesBucket();
     const supabase = getSupabaseAdminClient();
     const { error: uploadError } = await supabase.storage.from(projectFilesBucket).upload(uploadedPath, buffer, {
       contentType: "application/pdf",
@@ -436,6 +438,7 @@ export async function deleteProjectFileAction(projectId: string, formData: FormD
     throw new Error("You cannot delete files outside your organization.");
   }
 
+  await ensureProjectFilesBucket();
   const supabase = getSupabaseAdminClient();
   const { error: removeError } = await supabase.storage.from(projectFilesBucket).remove([file.storagePath]);
 
