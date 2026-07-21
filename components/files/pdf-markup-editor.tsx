@@ -197,8 +197,8 @@ export function PdfMarkupEditor({ canManageFiles, exportMarkupAction, file, save
 
       try {
         const pdfjs = await import("pdfjs-dist");
+        pdfjs.GlobalWorkerOptions.workerSrc = "/pdf.worker.min.mjs";
         const loadingTask = (pdfjs.getDocument as (source: unknown) => { promise: Promise<unknown> })({
-          disableWorker: true,
           url: file.previewHref
         });
         loadedDoc = (await loadingTask.promise) as PdfDocProxy;
