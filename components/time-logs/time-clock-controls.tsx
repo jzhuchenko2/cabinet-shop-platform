@@ -90,6 +90,7 @@ export function TimeClockControls({
   const [isReviewOpen, setIsReviewOpen] = useState(false);
   const [now, setNow] = useState(() => Date.now());
   const [selectedProjectId, setSelectedProjectId] = useState(activeEntry?.projectId ?? "");
+  const [selectedTaskId, setSelectedTaskId] = useState(activeEntry?.taskId ?? "");
 
   useEffect(() => {
     const timer = window.setInterval(() => setNow(Date.now()), 60000);
@@ -99,8 +100,9 @@ export function TimeClockControls({
 
   useEffect(() => {
     setSelectedProjectId(activeEntry?.projectId ?? "");
+    setSelectedTaskId(activeEntry?.taskId ?? "");
     setIsReviewOpen(false);
-  }, [activeEntry?.id, activeEntry?.projectId]);
+  }, [activeEntry?.id, activeEntry?.projectId, activeEntry?.taskId]);
 
   function formatTime(value: string | null) {
     if (!value) {
@@ -115,9 +117,15 @@ export function TimeClockControls({
 
   const currentShiftMinutes = activeEntry ? getElapsedMinutes(activeEntry.startedAt, now) : 0;
   const filteredTaskOptions = useMemo(
-    () => taskOptions.filter((task) => !selectedProjectId || task.projectId === selectedProjectId),
+    () => taskOptions.filter((task) => selectedProjectId && task.projectId === selectedProjectId),
     [selectedProjectId, taskOptions]
   );
+
+  useEffect(() => {
+    if (selectedTaskId && !filteredTaskOptions.some((task) => task.id === selectedTaskId)) {
+      setSelectedTaskId("");
+    }
+  }, [filteredTaskOptions, selectedTaskId]);
 
   return (
     <section className="card">
@@ -209,14 +217,15 @@ export function TimeClockControls({
             <form action={clockOutAction} className="form timecard-review-form">
               <input name="entryId" type="hidden" value={activeEntry.id} />
               <div className="field">
-                <label htmlFor="clock-out-project">Project worked on</label>
+                <label htmlFor="clock-out-project">Project worked on *</label>
                 <select
-                  defaultValue={activeEntry.projectId}
                   id="clock-out-project"
                   name="projectId"
                   onChange={(event) => setSelectedProjectId(event.target.value)}
+                  required
+                  value={selectedProjectId}
                 >
-                  <option value="">General shop time</option>
+                  <option value="">Select a project</option>
                   {projectOptions.map((project) => (
                     <option key={project.id} value={project.id}>
                       {project.name} - {project.client}
@@ -225,23 +234,29 @@ export function TimeClockControls({
                 </select>
               </div>
               <div className="field">
-                <label htmlFor="clock-out-task">Task worked on</label>
-                <select defaultValue={activeEntry.taskId} id="clock-out-task" name="taskId">
-                  <option value="">No task selected</option>
+                <label htmlFor="clock-out-task">Task worked on *</label>
+                <select
+                  id="clock-out-task"
+                  name="taskId"
+                  onChange={(event) => setSelectedTaskId(event.target.value)}
+                  required
+                  value={selectedTaskId}
+                >
+                  <option value="">{selectedProjectId ? "Select a task" : "Select a project first"}</option>
                   {filteredTaskOptions.map((task) => (
                     <option key={task.id} value={task.id}>
-                      {task.projectName} - {task.title}
+                      {task.title}
                     </option>
                   ))}
                 </select>
               </div>
               <div className="field">
-                <label htmlFor="clock-out-notes">Notes</label>
+                <label htmlFor="clock-out-notes">Work notes</label>
                 <textarea
                   defaultValue={activeEntry.notes}
                   id="clock-out-notes"
                   name="notes"
-                  placeholder="Optional notes about the work completed"
+                  placeholder="Optional notes about what was completed, blockers, or handoff details"
                   rows={4}
                 />
               </div>
