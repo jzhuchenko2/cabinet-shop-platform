@@ -1,5 +1,6 @@
 import { prisma } from "@/lib/prisma";
 import type { FileType } from "@prisma/client";
+import type { PdfDeletedPages, PdfMarkupDocument, PdfPageRotations } from "@/lib/pdf-markup";
 
 export function listProjectFiles(projectId: string) {
   return prisma.file.findMany({
@@ -31,7 +32,11 @@ export function createProjectFile({
   storagePath,
   mimeType,
   sizeBytes,
-  fileType
+  fileType,
+  sourceFileId,
+  markupJson,
+  pageRotations,
+  deletedPages
 }: {
   projectId: string;
   uploadedById: string;
@@ -40,6 +45,10 @@ export function createProjectFile({
   mimeType: string;
   sizeBytes: number;
   fileType: FileType;
+  sourceFileId?: string | null;
+  markupJson?: PdfMarkupDocument | null;
+  pageRotations?: PdfPageRotations | null;
+  deletedPages?: PdfDeletedPages | null;
 }) {
   return prisma.file.create({
     data: {
@@ -49,7 +58,11 @@ export function createProjectFile({
       storagePath,
       mimeType,
       sizeBytes,
-      fileType
+      fileType,
+      sourceFileId,
+      markupJson: markupJson ?? undefined,
+      pageRotations: pageRotations ?? undefined,
+      deletedPages: deletedPages ?? undefined
     }
   });
 }
@@ -68,6 +81,31 @@ export function updateProjectFile({
     data: {
       name,
       fileType
+    }
+  });
+}
+
+export function updateProjectFileMarkup({
+  fileId,
+  markupJson,
+  pageRotations,
+  deletedPages,
+  userId
+}: {
+  fileId: string;
+  markupJson: PdfMarkupDocument;
+  pageRotations: PdfPageRotations;
+  deletedPages: PdfDeletedPages;
+  userId: string;
+}) {
+  return prisma.file.update({
+    where: { id: fileId },
+    data: {
+      markupJson,
+      pageRotations,
+      deletedPages,
+      lastMarkedUpById: userId,
+      lastMarkedUpAt: new Date()
     }
   });
 }

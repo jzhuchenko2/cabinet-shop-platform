@@ -1966,6 +1966,90 @@ h3 {
   max-width: none;
 }
 
+.pdf-editor {
+  display: grid;
+  gap: 10px;
+  grid-template-rows: auto auto minmax(0, 1fr);
+  min-height: 0;
+}
+
+.pdf-editor-toolbar {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.pdf-editor-page-controls,
+.pdf-editor-tool-group {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.pdf-editor-page-controls span {
+  color: var(--charcoal-strong);
+  font-size: 13px;
+  font-weight: 900;
+  min-width: 96px;
+  text-align: center;
+}
+
+.pdf-editor-tool-group input[type="color"] {
+  background: #ffffff;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  cursor: pointer;
+  height: 40px;
+  padding: 4px;
+  width: 48px;
+}
+
+.pdf-editor-tool-group input[type="range"] {
+  accent-color: var(--accent);
+  width: 112px;
+}
+
+.pdf-editor-action-form {
+  display: inline-flex;
+}
+
+.pdf-editor-stage {
+  align-content: start;
+  background: #e7e4de;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  min-height: 0;
+  overflow: auto;
+  padding: 18px;
+}
+
+.pdf-page-surface {
+  background: #ffffff;
+  box-shadow: 0 12px 28px rgba(32, 33, 39, 0.22);
+  display: grid;
+  justify-self: center;
+  position: relative;
+}
+
+.pdf-page-surface canvas,
+.pdf-annotation-layer {
+  grid-area: 1 / 1;
+}
+
+.pdf-annotation-layer {
+  height: 100%;
+  pointer-events: none;
+  width: 100%;
+}
+
+.pdf-annotation-layer.editable {
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
 .field {
   display: grid;
   gap: 6px;

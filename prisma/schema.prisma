@@ -39,6 +39,7 @@ model User {
   timeLogs         TimeLog[]
   timeClockEntries TimeClockEntry[]
   uploadedFiles    File[]
+  lastMarkedUpFiles File[]          @relation("FileLastMarkedUpBy")
   uploadedPhotos   Photo[]
   chatParticipants ConversationParticipant[]
   sentChatMessages ChatMessage[]
@@ -254,18 +255,29 @@ model File {
   task          Task?        @relation(fields: [taskId], references: [id])
   uploadedById  String
   uploadedBy    User         @relation(fields: [uploadedById], references: [id])
+  sourceFileId  String?
+  sourceFile    File?        @relation("FileRevisions", fields: [sourceFileId], references: [id], onDelete: SetNull)
+  revisions     File[]       @relation("FileRevisions")
+  lastMarkedUpById String?
+  lastMarkedUpBy   User?     @relation("FileLastMarkedUpBy", fields: [lastMarkedUpById], references: [id], onDelete: SetNull)
 
   name        String
   storagePath String
   mimeType    String?
   sizeBytes   Int?
   fileType    FileType @default(DOCUMENT)
+  markupJson  Json?
+  pageRotations Json?
+  deletedPages Json?
+  lastMarkedUpAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
   @@index([projectId, createdAt])
   @@index([uploadedById])
+  @@index([sourceFileId])
+  @@index([lastMarkedUpById])
 }
 
 model Photo {
