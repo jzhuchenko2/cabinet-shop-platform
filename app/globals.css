@@ -663,6 +663,13 @@ h3 {
   overflow-x: auto;
 }
 
+.calendar-workspace {
+  align-items: start;
+  display: grid;
+  gap: 16px;
+  grid-template-columns: minmax(720px, 1fr) 360px;
+}
+
 .calendar-shell {
   min-height: 680px;
 }
@@ -771,10 +778,16 @@ h3 {
   border: 1px solid var(--line);
   border-left: 5px solid var(--accent);
   border-radius: 6px;
+  color: inherit;
+  cursor: pointer;
   display: grid;
+  font: inherit;
   gap: 3px;
   min-width: 0;
   padding: 7px 8px;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
 }
 
 .calendar-event:hover {
@@ -800,8 +813,24 @@ h3 {
   font-weight: 700;
 }
 
-.calendar-event.project {
+.calendar-event.project-due {
   background: #fff7e5;
+}
+
+.calendar-event.task-due {
+  background: #f8fbf7;
+}
+
+.calendar-event.company {
+  background: #fff4ec;
+}
+
+.calendar-event.personal {
+  background: #f5f7fb;
+}
+
+.calendar-event.due-soon {
+  box-shadow: inset 0 0 0 1px rgba(243, 111, 33, 0.24);
 }
 
 .calendar-empty {
@@ -837,8 +866,81 @@ h3 {
   background: var(--accent);
 }
 
-.calendar-key.task {
-  background: var(--charcoal);
+.calendar-key.company {
+  background: #c7511f;
+}
+
+.calendar-key.personal {
+  background: #4b6f9f;
+}
+
+.calendar-side-panel {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.calendar-upcoming-list {
+  display: grid;
+  gap: 8px;
+}
+
+.calendar-upcoming-item {
+  align-items: center;
+  background: #fffaf3;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: inherit;
+  cursor: pointer;
+  display: grid;
+  font: inherit;
+  gap: 10px;
+  grid-template-columns: 12px minmax(0, 1fr);
+  padding: 10px;
+  text-align: left;
+  text-decoration: none;
+  width: 100%;
+}
+
+.calendar-upcoming-item:hover {
+  border-color: var(--accent);
+  box-shadow: 0 10px 20px rgba(32, 33, 39, 0.08);
+}
+
+.calendar-upcoming-item i {
+  border-radius: 999px;
+  height: 12px;
+  width: 12px;
+}
+
+.calendar-upcoming-item span {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.calendar-upcoming-item strong,
+.calendar-upcoming-item small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.calendar-upcoming-item strong {
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.calendar-upcoming-item small {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.calendar-delete-form {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
 }
 
 .chat-shell {
@@ -2204,6 +2306,10 @@ h3 {
 
   .time-card-scope-form {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .calendar-workspace {
+    grid-template-columns: 1fr;
   }
 
   .calendar-toolbar {

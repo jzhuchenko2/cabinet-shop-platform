@@ -18,7 +18,7 @@
 14. Work-area pages - Shop Floor, Sales, Design, and Engineering expanded with working local MVP controls, queues, uploads, and checklists
 15. RBAC foundation - owner/admin and manager full access, shop lead department access, employee task-focused dashboard and scoped task updates
 16. RBAC test checklist - local manager vs employee access verification added in docs
-17. Calendar - shared week/month project and task due-date calendar added with manager-only settings navigation
+17. Calendar - shared week/month project and task due-date calendar added with personal, company, and project layers; managers can customize company events
 
 ## Notes
 
@@ -31,7 +31,7 @@ The first implementation pass should focus on getting a simple vertical slice wo
 - Move the project through the Sales, Design, Engineering, Milling, Construction, Finish, Delivery, and Install workflow
 - Upload files
 - See current status on the dashboard workflow and work-area views
-- Review project and task due dates on the shared shop calendar
+- Review personal events, company events, project install dates, project due dates, and task due dates on the shared shop calendar
 
 ## Future Specs
 
