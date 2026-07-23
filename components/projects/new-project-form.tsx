@@ -2,7 +2,12 @@
 
 import { useFormState, useFormStatus } from "react-dom";
 import type { CreateProjectState } from "@/app/(app)/projects/new/actions";
-import { departmentWorkflow } from "@/lib/constants/workflow";
+
+type DepartmentOption = {
+  id: string;
+  name: string;
+  workflowKey: string;
+};
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -15,9 +20,11 @@ function SubmitButton() {
 }
 
 export function NewProjectForm({
-  action
+  action,
+  departments
 }: {
   action: (state: CreateProjectState, formData: FormData) => Promise<CreateProjectState>;
+  departments: DepartmentOption[];
 }) {
   const [state, formAction] = useFormState(action, {});
 
@@ -34,8 +41,8 @@ export function NewProjectForm({
       <div className="field">
         <label htmlFor="department">Current department</label>
         <select id="department" name="department">
-          {departmentWorkflow.map((department) => (
-            <option key={department.key} value={department.key}>
+          {departments.map((department) => (
+            <option key={department.id} value={department.workflowKey}>
               {department.name}
             </option>
           ))}

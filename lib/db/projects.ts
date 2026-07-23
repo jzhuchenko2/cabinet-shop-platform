@@ -155,12 +155,11 @@ export async function createProject({
         name: clientName
       }
     }),
-    prisma.department.findUnique({
+    prisma.department.findFirst({
       where: {
-        organizationId_workflowKey: {
-          organizationId,
-          workflowKey: departmentKey
-        }
+        organizationId,
+        workflowKey: departmentKey,
+        isActive: true
       }
     })
   ]);

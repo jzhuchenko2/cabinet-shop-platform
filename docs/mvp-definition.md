@@ -20,6 +20,7 @@ The first customer is a small to mid-sized custom cabinet shop that needs better
 - Project list and project detail pages
 - Client records with active files and archived project history
 - Project status and department stage tracking
+- Manager workflow settings for renaming, reordering, hiding, restoring, and adding active department stages
 - Task model with department ownership
 - Shop Floor, Sales, Design, and Engineering work views
 - Project PDF upload, metadata editing, deletion, viewing, and download with manager-only write access

@@ -6,6 +6,7 @@ The chat MVP gives every signed-in shop user access to `/chats`.
 
 - Direct messages between two users in the same organization.
 - Group chats with a custom title and selected shop users.
+- Project group chats can be associated to a specific active project so project decisions and install/delivery updates stay connected to the job.
 - Conversation unread counts based on each participant's `lastReadAt`.
 - Message notifications are stored as `Notification` rows with type `CHAT_MESSAGE`.
 - The chat workspace refreshes every five seconds while the browser tab is visible.
@@ -18,7 +19,7 @@ All active shop roles receive the `view_chats` permission. Settings remain manag
 
 Chats use three Prisma models:
 
-- `Conversation` stores organization, creator, title, and direct/group type.
+- `Conversation` stores organization, creator, optional project, title, and direct/group type.
 - `ConversationParticipant` links users to conversations and tracks read state.
 - `ChatMessage` stores message body, sender, and timestamp.
 

@@ -61,6 +61,8 @@ model Department {
   name           String
   workflowKey    DepartmentKey
   sortOrder      Int
+  deadlineLabel  String?
+  isActive       Boolean       @default(true)
   users          User[]
   projects       Project[]
   tasks          Task[]
@@ -70,6 +72,7 @@ model Department {
   updatedAt DateTime @updatedAt
 
   @@unique([organizationId, workflowKey])
+  @@index([organizationId, isActive, sortOrder])
   @@index([organizationId, sortOrder])
 }
 
@@ -120,6 +123,7 @@ model Project {
   timeLogs         TimeLog[]
   timeClockEntries TimeClockEntry[]
   calendarEvents   CalendarEvent[]
+  conversations    Conversation[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -332,6 +336,8 @@ model Conversation {
   organization   Organization      @relation(fields: [organizationId], references: [id])
   createdById    String?
   createdBy      User?             @relation("ConversationCreator", fields: [createdById], references: [id])
+  projectId      String?
+  project        Project?          @relation(fields: [projectId], references: [id], onDelete: SetNull)
 
   title String?
   type  ConversationType @default(DIRECT)
@@ -344,6 +350,7 @@ model Conversation {
 
   @@index([organizationId, updatedAt])
   @@index([createdById])
+  @@index([projectId])
 }
 
 model ConversationParticipant {

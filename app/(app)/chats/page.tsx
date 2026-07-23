@@ -2,7 +2,7 @@ import { ChatWorkspace } from "@/components/chats/chat-workspace";
 import { AccessDenied } from "@/components/ui/access-denied";
 import { PageHeader } from "@/components/ui/page-header";
 import { getCurrentUser } from "@/lib/auth";
-import { getConversationForUser, listOrganizationChatUsers, listUserConversations, markConversationRead } from "@/lib/db/chats";
+import { getConversationForUser, listChatProjects, listOrganizationChatUsers, listUserConversations, markConversationRead } from "@/lib/db/chats";
 import { hasPermission } from "@/lib/rbac";
 import { createDirectChatAction, createGroupChatAction, sendChatMessageAction } from "./actions";
 
@@ -32,6 +32,13 @@ function toConversationSummary(conversation: Awaited<ReturnType<typeof listUserC
     id: conversation.id,
     title: getConversationTitle(conversation, currentUserId),
     type: conversation.type,
+    project: conversation.project
+      ? {
+          id: conversation.project.id,
+          name: conversation.project.name,
+          client: conversation.project.client.name
+        }
+      : null,
     participantNames: conversation.participants.map((participant) => participant.user.name),
     lastMessage: lastMessage ? `${lastMessage.sender.name}: ${lastMessage.body}` : "No messages yet",
     lastMessageAt: lastMessage?.createdAt.toISOString() ?? null,
@@ -44,6 +51,13 @@ function toSelectedConversation(conversation: NonNullable<Awaited<ReturnType<typ
     id: conversation.id,
     title: getConversationTitle(conversation, currentUserId),
     type: conversation.type,
+    project: conversation.project
+      ? {
+          id: conversation.project.id,
+          name: conversation.project.name,
+          client: conversation.project.client.name
+        }
+      : null,
     participants: conversation.participants.map((participant) => ({
       id: participant.user.id,
       name: participant.user.name,
@@ -77,8 +91,9 @@ export default async function ChatsPage({ searchParams }: ChatPageProps) {
     await markConversationRead(selectedConversationId, currentUser);
   }
 
-  const [users, conversations, selectedConversation] = await Promise.all([
+  const [users, projects, conversations, selectedConversation] = await Promise.all([
     listOrganizationChatUsers(currentUser),
+    listChatProjects(currentUser),
     listUserConversations(currentUser),
     selectedConversationId ? getConversationForUser(selectedConversationId, currentUser) : Promise.resolve(null)
   ]);
@@ -87,16 +102,17 @@ export default async function ChatsPage({ searchParams }: ChatPageProps) {
 
   return (
     <>
-      <PageHeader
-        eyebrow="Communication"
-        title="Chats"
-        description="Direct messages and group chats for project decisions, blockers, and shop-floor updates."
-      />
+      <PageHeader eyebrow="Communication" title="Chats" />
       <ChatWorkspace
         conversations={conversations.map((conversation) => toConversationSummary(conversation, currentUser.id))}
         createDirectChatAction={createDirectChatAction}
         createGroupChatAction={createGroupChatAction}
         currentUserId={currentUser.id}
+        projects={projects.map((project) => ({
+          id: project.id,
+          name: project.name,
+          client: project.client.name
+        }))}
         selectedConversation={selectedConversation ? toSelectedConversation(selectedConversation, currentUser.id) : null}
         sendMessageAction={sendMessageAction}
         users={users}

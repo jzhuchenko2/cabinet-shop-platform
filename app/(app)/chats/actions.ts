@@ -7,6 +7,11 @@ import { createGroupConversation, createOrGetDirectConversation, sendConversatio
 import { hasPermission } from "@/lib/rbac";
 import { requiredString } from "@/lib/validations/common";
 
+function optionalString(value: FormDataEntryValue | null) {
+  const text = String(value ?? "").trim();
+  return text || null;
+}
+
 export async function createDirectChatAction(formData: FormData) {
   const currentUser = await getCurrentUser();
 
@@ -28,9 +33,10 @@ export async function createGroupChatAction(formData: FormData) {
     return;
   }
 
-  const title = requiredString(formData.get("title"), "Group name");
+  const title = optionalString(formData.get("title"));
+  const projectId = optionalString(formData.get("projectId"));
   const participantIds = formData.getAll("participantIds").map((value) => String(value));
-  const conversation = await createGroupConversation(currentUser, { title, participantIds });
+  const conversation = await createGroupConversation(currentUser, { title, participantIds, projectId });
 
   revalidatePath("/chats");
   redirect(`/chats?conversationId=${conversation.id}`);

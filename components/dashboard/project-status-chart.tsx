@@ -1,16 +1,22 @@
 import Link from "next/link";
-import { departmentWorkflow } from "@/lib/constants/workflow";
 import type { listDashboardProjectStatuses } from "@/lib/db/projects";
 
 type DashboardProject = Awaited<ReturnType<typeof listDashboardProjectStatuses>>[number];
+type WorkflowDepartment = {
+  id: string;
+  name: string;
+  workflowKey: string;
+  sortOrder: number;
+  deadlineLabel: string | null;
+};
 
 type DepartmentBlockStatus = "complete" | "needs-effort" | "upcoming";
 
 const handoffReadyStatuses = ["READY", "DONE", "CANCELED"];
 const activeWorkStatuses = ["TODO", "IN_PROGRESS"];
 
-function getCurrentWorkflowIndex(project: DashboardProject) {
-  return departmentWorkflow.findIndex((department) => department.key === project.currentDepartment?.workflowKey);
+function getCurrentWorkflowIndex(project: DashboardProject, departments: WorkflowDepartment[]) {
+  return departments.findIndex((department) => department.workflowKey === project.currentDepartment?.workflowKey);
 }
 
 function getDepartmentTasks(project: DashboardProject, workflowKey: string) {
@@ -47,50 +53,50 @@ function isDepartmentHandoffReady(project: DashboardProject, workflowKey: string
   return tasks.length > 0 && tasks.every((task) => handoffReadyStatuses.includes(task.status));
 }
 
-function getNeedsEffortIndex(project: DashboardProject) {
-  const currentIndex = getCurrentWorkflowIndex(project);
+function getNeedsEffortIndex(project: DashboardProject, departments: WorkflowDepartment[]) {
+  const currentIndex = getCurrentWorkflowIndex(project, departments);
 
   if (currentIndex < 0) {
     return -1;
   }
 
-  const earliestBlockedThroughCurrentIndex = departmentWorkflow.findIndex(
-    (department, index) => index <= currentIndex && hasBlockedTask(project, department.key)
+  const earliestBlockedThroughCurrentIndex = departments.findIndex(
+    (department, index) => index <= currentIndex && hasBlockedTask(project, department.workflowKey)
   );
 
   if (earliestBlockedThroughCurrentIndex >= 0) {
     return earliestBlockedThroughCurrentIndex;
   }
 
-  const currentDepartment = departmentWorkflow[currentIndex];
+  const currentDepartment = departments[currentIndex];
 
-  if (project.isBlocked || hasActiveWorkTask(project, currentDepartment.key)) {
+  if (project.isBlocked || hasActiveWorkTask(project, currentDepartment.workflowKey)) {
     return currentIndex;
   }
 
-  if (!isDepartmentHandoffReady(project, currentDepartment.key)) {
+  if (!isDepartmentHandoffReady(project, currentDepartment.workflowKey)) {
     return currentIndex;
   }
 
-  const nextBlockedIndex = departmentWorkflow.findIndex(
-    (department, index) => index > currentIndex && hasBlockedTask(project, department.key)
+  const nextBlockedIndex = departments.findIndex(
+    (department, index) => index > currentIndex && hasBlockedTask(project, department.workflowKey)
   );
 
   if (nextBlockedIndex >= 0) {
     return nextBlockedIndex;
   }
 
-  const nextActiveWorkIndex = departmentWorkflow.findIndex(
-    (department, index) => index > currentIndex && hasActiveWorkTask(project, department.key)
+  const nextActiveWorkIndex = departments.findIndex(
+    (department, index) => index > currentIndex && hasActiveWorkTask(project, department.workflowKey)
   );
 
   return nextActiveWorkIndex;
 }
 
-function getDepartmentBlockStatus(project: DashboardProject, workflowKey: string): DepartmentBlockStatus {
-  const currentIndex = departmentWorkflow.findIndex((department) => department.key === project.currentDepartment?.workflowKey);
-  const stageIndex = departmentWorkflow.findIndex((department) => department.key === workflowKey);
-  const needsEffortIndex = getNeedsEffortIndex(project);
+function getDepartmentBlockStatus(project: DashboardProject, workflowKey: string, departments: WorkflowDepartment[]): DepartmentBlockStatus {
+  const currentIndex = departments.findIndex((department) => department.workflowKey === project.currentDepartment?.workflowKey);
+  const stageIndex = departments.findIndex((department) => department.workflowKey === workflowKey);
+  const needsEffortIndex = getNeedsEffortIndex(project, departments);
 
   if (project.status === "COMPLETE") {
     return "complete";
@@ -138,7 +144,7 @@ function formatDueDate(value: Date | null) {
   }).format(value);
 }
 
-export function ProjectStatusChart({ projects }: { projects: DashboardProject[] }) {
+export function ProjectStatusChart({ projects, departments }: { projects: DashboardProject[]; departments: WorkflowDepartment[] }) {
   return (
     <section className="card project-status-card">
       <div className="section-heading-row">
@@ -172,14 +178,14 @@ export function ProjectStatusChart({ projects }: { projects: DashboardProject[] 
                 </span>
               </div>
               <ol className="project-status-track" aria-label={`${project.name} department status`}>
-                {departmentWorkflow.map((department) => {
-                  const status = getDepartmentBlockStatus(project, department.key);
-                  const loggedMinutes = getDepartmentLoggedMinutes(project, department.key);
+                {departments.map((department) => {
+                  const status = getDepartmentBlockStatus(project, department.workflowKey, departments);
+                  const loggedMinutes = getDepartmentLoggedMinutes(project, department.workflowKey);
 
                   return (
                     <li
                       className={`project-flow-step ${status}`}
-                      key={department.key}
+                      key={department.id}
                       title={`${department.name}: ${status.replace("-", " ")}`}
                     >
                       <span className="project-flow-node" />

@@ -8,6 +8,7 @@ import { LiveTimeClockPanel } from "@/components/time-logs/live-time-clock-panel
 import { PageHeader } from "@/components/ui/page-header";
 import { StatCard } from "@/components/ui/stat-card";
 import { getCurrentUser } from "@/lib/auth";
+import { listWorkflowDepartments } from "@/lib/db/departments";
 import { listDashboardProjectStatuses } from "@/lib/db/projects";
 import { listActiveTimeClockEntries } from "@/lib/db/time-logs";
 import { isFullAccess } from "@/lib/rbac";
@@ -31,12 +32,13 @@ export default async function DashboardPage() {
     return <EmployeeDashboard user={currentUser} />;
   }
 
-  const [activeTimeEntries, projectStatuses] = currentUser
+  const [activeTimeEntries, projectStatuses, workflowDepartments] = currentUser
     ? await Promise.all([
         listActiveTimeClockEntries(currentUser),
-        listDashboardProjectStatuses(currentUser.organizationId)
+        listDashboardProjectStatuses(currentUser.organizationId),
+        listWorkflowDepartments(currentUser.organizationId)
       ])
-    : [[], []];
+    : [[], [], []];
 
   const blockedProjectCount = projectStatuses.filter((project) => project.isBlocked || project.status === "BLOCKED").length;
   const dueThisWeekCount = projectStatuses.filter((project) => isDueThisWeek(project.dueDate)).length;
@@ -89,9 +91,9 @@ export default async function DashboardPage() {
         }))}
       />
 
-      <ShopOverviewChart projects={projectStatuses} />
+      <ShopOverviewChart departments={workflowDepartments} projects={projectStatuses} />
 
-      <ProjectStatusChart projects={projectStatuses} />
+      <ProjectStatusChart departments={workflowDepartments} projects={projectStatuses} />
     </>
   );
 }
