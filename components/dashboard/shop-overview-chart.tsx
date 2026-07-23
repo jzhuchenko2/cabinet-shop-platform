@@ -1,7 +1,13 @@
-import { departmentWorkflow } from "@/lib/constants/workflow";
 import type { listDashboardProjectStatuses } from "@/lib/db/projects";
 
 type DashboardProject = Awaited<ReturnType<typeof listDashboardProjectStatuses>>[number];
+type WorkflowDepartment = {
+  id: string;
+  name: string;
+  workflowKey: string;
+  sortOrder: number;
+  deadlineLabel: string | null;
+};
 type DepartmentHealth = "complete" | "needs-effort" | "upcoming";
 
 const handoffReadyStatuses = ["READY", "DONE", "CANCELED"];
@@ -11,8 +17,8 @@ function getDepartmentTasks(project: DashboardProject, workflowKey: string) {
   return project.tasks.filter((task) => task.department?.workflowKey === workflowKey);
 }
 
-function getCurrentWorkflowIndex(project: DashboardProject) {
-  return departmentWorkflow.findIndex((department) => department.key === project.currentDepartment?.workflowKey);
+function getCurrentWorkflowIndex(project: DashboardProject, departments: WorkflowDepartment[]) {
+  return departments.findIndex((department) => department.workflowKey === project.currentDepartment?.workflowKey);
 }
 
 function hasBlockedTask(project: DashboardProject, workflowKey: string) {
@@ -29,48 +35,48 @@ function isDepartmentHandoffReady(project: DashboardProject, workflowKey: string
   return tasks.length > 0 && tasks.every((task) => handoffReadyStatuses.includes(task.status));
 }
 
-function getNeedsEffortIndex(project: DashboardProject) {
-  const currentIndex = getCurrentWorkflowIndex(project);
+function getNeedsEffortIndex(project: DashboardProject, departments: WorkflowDepartment[]) {
+  const currentIndex = getCurrentWorkflowIndex(project, departments);
 
   if (currentIndex < 0) {
     return -1;
   }
 
-  const earliestBlockedThroughCurrentIndex = departmentWorkflow.findIndex(
-    (department, index) => index <= currentIndex && hasBlockedTask(project, department.key)
+  const earliestBlockedThroughCurrentIndex = departments.findIndex(
+    (department, index) => index <= currentIndex && hasBlockedTask(project, department.workflowKey)
   );
 
   if (earliestBlockedThroughCurrentIndex >= 0) {
     return earliestBlockedThroughCurrentIndex;
   }
 
-  const currentDepartment = departmentWorkflow[currentIndex];
+  const currentDepartment = departments[currentIndex];
 
-  if (project.isBlocked || hasActiveWorkTask(project, currentDepartment.key)) {
+  if (project.isBlocked || hasActiveWorkTask(project, currentDepartment.workflowKey)) {
     return currentIndex;
   }
 
-  if (!isDepartmentHandoffReady(project, currentDepartment.key)) {
+  if (!isDepartmentHandoffReady(project, currentDepartment.workflowKey)) {
     return currentIndex;
   }
 
-  const nextBlockedIndex = departmentWorkflow.findIndex(
-    (department, index) => index > currentIndex && hasBlockedTask(project, department.key)
+  const nextBlockedIndex = departments.findIndex(
+    (department, index) => index > currentIndex && hasBlockedTask(project, department.workflowKey)
   );
 
   if (nextBlockedIndex >= 0) {
     return nextBlockedIndex;
   }
 
-  return departmentWorkflow.findIndex(
-    (department, index) => index > currentIndex && hasActiveWorkTask(project, department.key)
+  return departments.findIndex(
+    (department, index) => index > currentIndex && hasActiveWorkTask(project, department.workflowKey)
   );
 }
 
-function getProjectDepartmentHealth(project: DashboardProject, workflowKey: string): DepartmentHealth {
-  const currentIndex = getCurrentWorkflowIndex(project);
-  const stageIndex = departmentWorkflow.findIndex((department) => department.key === workflowKey);
-  const needsEffortIndex = getNeedsEffortIndex(project);
+function getProjectDepartmentHealth(project: DashboardProject, workflowKey: string, departments: WorkflowDepartment[]): DepartmentHealth {
+  const currentIndex = getCurrentWorkflowIndex(project, departments);
+  const stageIndex = departments.findIndex((department) => department.workflowKey === workflowKey);
+  const needsEffortIndex = getNeedsEffortIndex(project, departments);
 
   if (project.status === "COMPLETE") {
     return "complete";
@@ -103,11 +109,11 @@ function formatHours(minutes: number) {
   return `${Math.round((minutes / 60) * 10) / 10}h`;
 }
 
-export function ShopOverviewChart({ projects }: { projects: DashboardProject[] }) {
-  const departmentSummaries = departmentWorkflow.map((department) => {
+export function ShopOverviewChart({ projects, departments }: { projects: DashboardProject[]; departments: WorkflowDepartment[] }) {
+  const departmentSummaries = departments.map((department) => {
     const healthCounts = projects.reduce(
       (counts, project) => {
-        const health = getProjectDepartmentHealth(project, department.key);
+        const health = getProjectDepartmentHealth(project, department.workflowKey, departments);
         counts[health] += 1;
         return counts;
       },
@@ -117,7 +123,7 @@ export function ShopOverviewChart({ projects }: { projects: DashboardProject[] }
       (total, project) =>
         total +
         project.timeLogs
-          .filter((log) => log.department?.workflowKey === department.key)
+          .filter((log) => log.department?.workflowKey === department.workflowKey)
           .reduce((departmentTotal, log) => departmentTotal + log.minutes, 0),
       0
     );
@@ -136,7 +142,7 @@ export function ShopOverviewChart({ projects }: { projects: DashboardProject[] }
   });
 
   const healthScore =
-    projects.length === 0
+    projects.length === 0 || departmentSummaries.length === 0
       ? 0
       : Math.round(
           (departmentSummaries.reduce((total, department) => total + department.completePercent, 0) /
@@ -170,7 +176,7 @@ export function ShopOverviewChart({ projects }: { projects: DashboardProject[] }
           const connectorClass = previousDepartment?.dominantHealth === "complete" ? "from-complete" : "";
 
           return (
-            <li className={`shop-overview-step ${department.dominantHealth} ${connectorClass}`} key={department.key}>
+            <li className={`shop-overview-step ${department.dominantHealth} ${connectorClass}`} key={department.id}>
               <div className="shop-overview-node">
                 <span>{department.completePercent}%</span>
               </div>

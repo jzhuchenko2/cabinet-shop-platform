@@ -19,6 +19,7 @@
 15. RBAC foundation - owner/admin and manager full access, shop lead department access, employee task-focused dashboard and scoped task updates
 16. RBAC test checklist - local manager vs employee access verification added in docs
 17. Calendar - shared week/month project and task due-date calendar added with personal, company, and project layers; managers can customize company events
+18. Settings - manager workflow editor added for active department stages, ordering, labels, and deadline targets
 
 ## Notes
 
@@ -28,7 +29,7 @@ The first implementation pass should focus on getting a simple vertical slice wo
 - Create a project with Prisma persistence
 - Add areas and cabinet items
 - Add tasks
-- Move the project through the Sales, Design, Engineering, Milling, Construction, Finish, Delivery, and Install workflow
+- Move the project through the manager-configured department workflow
 - Upload files
 - See current status on the dashboard workflow and work-area views
 - Review personal events, company events, project install dates, project due dates, and task due dates on the shared shop calendar

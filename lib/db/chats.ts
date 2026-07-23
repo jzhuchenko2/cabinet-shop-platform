@@ -19,6 +19,16 @@ const participantInclude = {
   }
 };
 
+const conversationProjectSelect = {
+  id: true,
+  name: true,
+  client: {
+    select: {
+      name: true
+    }
+  }
+};
+
 export async function listOrganizationChatUsers(user: CurrentUser) {
   return prisma.user.findMany({
     where: {
@@ -32,6 +42,17 @@ export async function listOrganizationChatUsers(user: CurrentUser) {
       name: "asc"
     },
     select: chatUserSelect
+  });
+}
+
+export async function listChatProjects(user: CurrentUser) {
+  return prisma.project.findMany({
+    where: {
+      organizationId: user.organizationId,
+      status: { not: "CANCELED" }
+    },
+    orderBy: [{ status: "asc" }, { name: "asc" }],
+    select: conversationProjectSelect
   });
 }
 
@@ -64,6 +85,9 @@ export async function listUserConversations(user: CurrentUser) {
           createdAt: "desc"
         },
         take: 1
+      },
+      project: {
+        select: conversationProjectSelect
       }
     },
     orderBy: {
@@ -123,6 +147,9 @@ export async function getConversationForUser(conversationId: string, user: Curre
         orderBy: {
           createdAt: "asc"
         }
+      },
+      project: {
+        select: conversationProjectSelect
       }
     }
   });
@@ -208,12 +235,27 @@ export async function createOrGetDirectConversation(user: CurrentUser, otherUser
   });
 }
 
-export async function createGroupConversation(user: CurrentUser, input: { title: string; participantIds: string[] }) {
-  const title = input.title.trim();
+export async function createGroupConversation(user: CurrentUser, input: { title: string | null; participantIds: string[]; projectId?: string | null }) {
+  const requestedProjectId = input.projectId?.trim() || null;
+  const project = requestedProjectId
+    ? await prisma.project.findFirst({
+        where: {
+          id: requestedProjectId,
+          organizationId: user.organizationId,
+          status: { not: "CANCELED" }
+        },
+        select: conversationProjectSelect
+      })
+    : null;
+  const title = input.title?.trim() || (project ? `${project.name} project chat` : "");
   const requestedParticipantIds = Array.from(new Set(input.participantIds.filter((participantId) => participantId !== user.id)));
 
   if (!title) {
-    throw new Error("Group name is required.");
+    throw new Error("Group name or project is required.");
+  }
+
+  if (requestedProjectId && !project) {
+    throw new Error("Choose a valid project for this chat.");
   }
 
   if (requestedParticipantIds.length < 1) {
@@ -241,6 +283,7 @@ export async function createGroupConversation(user: CurrentUser, input: { title:
     data: {
       organizationId: user.organizationId,
       createdById: user.id,
+      projectId: project?.id ?? null,
       title,
       type: "GROUP",
       participants: {

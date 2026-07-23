@@ -1,7 +1,6 @@
 export function PageHeader({
   eyebrow,
   title,
-  description,
   action
 }: {
   eyebrow?: string;
@@ -14,10 +13,8 @@ export function PageHeader({
       <div>
         {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
         <h1>{title}</h1>
-        {description ? <p className="muted">{description}</p> : null}
       </div>
       {action}
     </header>
   );
 }
-

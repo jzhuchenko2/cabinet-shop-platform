@@ -27,13 +27,17 @@ async function main() {
         },
         update: {
           name: department.name,
-          sortOrder: index + 1
+          sortOrder: index + 1,
+          deadlineLabel: department.deadline,
+          isActive: true
         },
         create: {
           organizationId: organization.id,
           name: department.name,
           workflowKey: department.key,
-          sortOrder: index + 1
+          sortOrder: index + 1,
+          deadlineLabel: department.deadline,
+          isActive: true
         }
       })
     )

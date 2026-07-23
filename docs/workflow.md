@@ -13,6 +13,8 @@ The platform should model the real department flow of a cabinet shop. Each proje
 7. Delivery
 8. Install
 
+Managers can customize the active workflow from Settings. The seeded flow gives each shop a practical starting point, but active stages can be renamed, reordered, hidden, restored, and expanded with any unused built-in stage type. Hidden stages stay in the database so historical projects, tasks, users, and time logs remain intact.
+
 ## Default Department Deadlines
 
 - Sales: 2 business days
@@ -33,6 +35,7 @@ The platform should model the real department flow of a cabinet shop. Each proje
 - The system should make it easy to see what is ready, waiting, blocked, or complete.
 - The dashboard should show each active project as a status row, with department blocks indicating completed work, work needing effort, and upcoming stages.
 - The manager dashboard should show a combined shop-flow chart above individual project rows so managers can scan overall shop health first.
+- Dashboard flow charts and new-project department choices read from the manager-configured active workflow.
 - The live time clock should start as a compact dashboard summary and expand into details only when clicked.
 - Task status changes revalidate the dashboard project chart, and the manager dashboard refreshes while open so department flow rows stay current during shop updates.
 - Department steps show logged hours from project time logs grouped by department.

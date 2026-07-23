@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useFormState, useFormStatus } from "react-dom";
 import type { CalendarEventActionState } from "@/app/(app)/calendar/actions";
 
@@ -164,11 +164,18 @@ export function CalendarView({
   const [mode, setMode] = useState<CalendarMode>("month");
   const [layer, setLayer] = useState<CalendarLayer>("ALL");
   const [cursor, setCursor] = useState(() => startOfDay(new Date()));
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState<CalendarEvent | null>(null);
   const [createState, createFormAction] = useFormState(createAction, {});
   const [updateState, updateFormAction] = useFormState(updateAction, {});
   const now = new Date();
   now.setHours(9, 0, 0, 0);
+
+  useEffect(() => {
+    if (createState.message) {
+      setIsCreateModalOpen(false);
+    }
+  }, [createState.message]);
 
   const filteredEvents = useMemo(() => events.filter((event) => eventMatchesLayer(event, layer)), [events, layer]);
   const eventsByDate = useMemo(() => {
@@ -296,68 +303,10 @@ export function CalendarView({
       </section>
 
       <aside className="calendar-side-panel">
-        <section className="card">
-          <p className="eyebrow">New event</p>
-          <h2>{canManageCompanyEvents ? "Schedule shop work" : "Add personal event"}</h2>
-          <form action={createFormAction} className="form">
-            <div className="field">
-              <label htmlFor="calendar-title">Title</label>
-              <input id="calendar-title" name="title" placeholder="Delivery, install, meeting..." required />
-            </div>
-            <div className="grid grid-2">
-              <div className="field">
-                <label htmlFor="calendar-visibility">Calendar</label>
-                <select id="calendar-visibility" name="visibility" defaultValue="PERSONAL">
-                  <option value="PERSONAL">Personal</option>
-                  {canManageCompanyEvents ? <option value="COMPANY">Company</option> : null}
-                </select>
-              </div>
-              <div className="field">
-                <label htmlFor="calendar-event-type">Type</label>
-                <select id="calendar-event-type" name="eventType" defaultValue="GENERAL">
-                  {eventTypeOptions.map((eventType) => (
-                    <option key={eventType.value} value={eventType.value}>
-                      {eventType.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-            <div className="field">
-              <label htmlFor="calendar-project">Project</label>
-              <select id="calendar-project" name="projectId" defaultValue="">
-                <option value="">No project</option>
-                {projectOptions.map((project) => (
-                  <option key={project.id} value={project.id}>
-                    {project.name} - {project.client}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="grid grid-2">
-              <div className="field">
-                <label htmlFor="calendar-starts-at">Starts</label>
-                <input id="calendar-starts-at" name="startsAt" required type="datetime-local" defaultValue={toDateTimeInputValue(now)} />
-              </div>
-              <div className="field">
-                <label htmlFor="calendar-ends-at">Ends</label>
-                <input id="calendar-ends-at" name="endsAt" type="datetime-local" />
-              </div>
-            </div>
-            {canManageCompanyEvents ? (
-              <div className="field">
-                <label htmlFor="calendar-color">Color</label>
-                <input id="calendar-color" name="color" type="color" defaultValue="#f36f21" />
-              </div>
-            ) : null}
-            <div className="field">
-              <label htmlFor="calendar-description">Notes</label>
-              <textarea id="calendar-description" name="description" rows={3} placeholder="Crew notes, delivery window, meeting location..." />
-            </div>
-            {createState.error ? <p className="form-error">{createState.error}</p> : null}
-            {createState.message ? <p className="form-success">{createState.message}</p> : null}
-            <SubmitButton label="Add event" />
-          </form>
+        <section className="card calendar-quick-action">
+          <button className="button" onClick={() => setIsCreateModalOpen(true)} type="button">
+            Add event
+          </button>
         </section>
 
         <section className="card">
@@ -390,6 +339,88 @@ export function CalendarView({
           </div>
         </section>
       </aside>
+
+      {isCreateModalOpen ? (
+        <div className="modal-overlay" role="presentation">
+          <div aria-labelledby="create-calendar-event-title" aria-modal="true" className="modal-panel" role="dialog">
+            <div className="section-heading-row">
+              <div>
+                <p className="eyebrow">New event</p>
+                <h2 id="create-calendar-event-title">{canManageCompanyEvents ? "Schedule shop work" : "Add personal event"}</h2>
+              </div>
+              <button aria-label="Close new event" className="icon-button" onClick={() => setIsCreateModalOpen(false)} type="button">
+                <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                  <path d="M6 6l12 12" />
+                  <path d="M18 6L6 18" />
+                </svg>
+              </button>
+            </div>
+            <form action={createFormAction} className="form">
+              <div className="field">
+                <label htmlFor="calendar-title">Title</label>
+                <input id="calendar-title" name="title" placeholder="Delivery, install, meeting..." required />
+              </div>
+              <div className="grid grid-2">
+                <div className="field">
+                  <label htmlFor="calendar-visibility">Calendar</label>
+                  <select id="calendar-visibility" name="visibility" defaultValue="PERSONAL">
+                    <option value="PERSONAL">Personal</option>
+                    {canManageCompanyEvents ? <option value="COMPANY">Company</option> : null}
+                  </select>
+                </div>
+                <div className="field">
+                  <label htmlFor="calendar-event-type">Type</label>
+                  <select id="calendar-event-type" name="eventType" defaultValue="GENERAL">
+                    {eventTypeOptions.map((eventType) => (
+                      <option key={eventType.value} value={eventType.value}>
+                        {eventType.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="field">
+                <label htmlFor="calendar-project">Project</label>
+                <select id="calendar-project" name="projectId" defaultValue="">
+                  <option value="">No project</option>
+                  {projectOptions.map((project) => (
+                    <option key={project.id} value={project.id}>
+                      {project.name} - {project.client}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="grid grid-2">
+                <div className="field">
+                  <label htmlFor="calendar-starts-at">Starts</label>
+                  <input id="calendar-starts-at" name="startsAt" required type="datetime-local" defaultValue={toDateTimeInputValue(now)} />
+                </div>
+                <div className="field">
+                  <label htmlFor="calendar-ends-at">Ends</label>
+                  <input id="calendar-ends-at" name="endsAt" type="datetime-local" />
+                </div>
+              </div>
+              {canManageCompanyEvents ? (
+                <div className="field">
+                  <label htmlFor="calendar-color">Color</label>
+                  <input id="calendar-color" name="color" type="color" defaultValue="#f36f21" />
+                </div>
+              ) : null}
+              <div className="field">
+                <label htmlFor="calendar-description">Notes</label>
+                <textarea id="calendar-description" name="description" rows={3} placeholder="Crew notes, delivery window, meeting location..." />
+              </div>
+              {createState.error ? <p className="form-error">{createState.error}</p> : null}
+              <div className="modal-actions">
+                <button className="button secondary" onClick={() => setIsCreateModalOpen(false)} type="button">
+                  Cancel
+                </button>
+                <SubmitButton label="Save event" />
+              </div>
+            </form>
+          </div>
+        </div>
+      ) : null}
 
       {selectedEvent && !selectedEvent.href ? (
         <div className="modal-overlay" role="presentation">
