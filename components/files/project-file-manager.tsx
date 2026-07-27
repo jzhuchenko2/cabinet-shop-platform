@@ -184,6 +184,11 @@ export function ProjectFileManager({
                 <a className="button secondary" href={selectedFile.downloadHref}>
                   Download
                 </a>
+                {canManageFiles ? (
+                  <a className="button secondary file-details-jump" href="#file-viewer-details">
+                    Details
+                  </a>
+                ) : null}
                 <button aria-label="Close file preview" className="icon-button" onClick={() => setSelectedFile(null)} type="button">
                   <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
                     <path d="M6 6l12 12" />
@@ -209,7 +214,7 @@ export function ProjectFileManager({
               />
 
               {canManageFiles ? (
-                <aside className="file-viewer-details">
+                <aside className="file-viewer-details" id="file-viewer-details">
                   <p className="eyebrow">File details</p>
                   <h3>Manager edits</h3>
                   <p className="muted">

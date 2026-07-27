@@ -2,6 +2,10 @@ node_modules/
 .next/
 .next-local/
 .next-settings-build/
+.next-shop-health-test/
+.next-mobile-polish/
+.next-file-chat-mobile/
+.next-mobile-nav-chat/
 out/
 dist/
 coverage/

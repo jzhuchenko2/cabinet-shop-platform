@@ -240,6 +240,54 @@ export function CalendarView({
           </div>
         </div>
 
+        <div className="calendar-mobile-agenda">
+          {days
+            .filter((day) => mode === "week" || day.getMonth() === cursor.getMonth())
+            .map((day) => {
+              const key = toDateKey(day);
+              const dayEvents = eventsByDate[key] ?? [];
+
+              return (
+                <section className="calendar-agenda-day" key={key}>
+                  <div className="calendar-agenda-date">
+                    <span>{new Intl.DateTimeFormat("en-US", { weekday: "short" }).format(day)}</span>
+                    <strong>{day.getDate()}</strong>
+                  </div>
+                  <div className="calendar-agenda-events">
+                    {dayEvents.length > 0 ? (
+                      dayEvents.map((event) =>
+                        event.href ? (
+                          <Link
+                            className={getEventClassName(event)}
+                            href={event.href}
+                            key={event.id}
+                            style={{ borderLeftColor: event.color ?? getProjectColor(event.projectId) }}
+                          >
+                            <span>{event.title}</span>
+                            <small>{event.subtitle}</small>
+                          </Link>
+                        ) : (
+                          <button
+                            className={getEventClassName(event)}
+                            key={event.id}
+                            onClick={() => setSelectedEvent(event)}
+                            style={{ borderLeftColor: event.color ?? getProjectColor(event.projectId) }}
+                            type="button"
+                          >
+                            <span>{event.title}</span>
+                            <small>{event.subtitle}</small>
+                          </button>
+                        )
+                      )
+                    ) : (
+                      <span className="calendar-empty">No scheduled work</span>
+                    )}
+                  </div>
+                </section>
+              );
+            })}
+        </div>
+
         <div className={mode === "month" ? "calendar-grid month" : "calendar-grid week"}>
           {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
             <div className="calendar-weekday" key={day}>

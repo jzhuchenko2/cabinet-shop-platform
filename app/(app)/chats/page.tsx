@@ -101,7 +101,7 @@ export default async function ChatsPage({ searchParams }: ChatPageProps) {
   const sendMessageAction = selectedConversation ? sendChatMessageAction.bind(null, selectedConversation.id) : undefined;
 
   return (
-    <>
+    <div className="chat-page">
       <PageHeader eyebrow="Communication" title="Chats" />
       <ChatWorkspace
         conversations={conversations.map((conversation) => toConversationSummary(conversation, currentUser.id))}
@@ -117,6 +117,6 @@ export default async function ChatsPage({ searchParams }: ChatPageProps) {
         sendMessageAction={sendMessageAction}
         users={users}
       />
-    </>
+    </div>
   );
 }

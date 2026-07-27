@@ -209,9 +209,50 @@ export function ChatWorkspace({
         {selectedConversation ? (
           <>
             <header className="chat-thread-header">
-              <Link className="chat-back-link" href="/chats">
-                Messages
-              </Link>
+              <div className="chat-thread-mobile-actions">
+                <Link aria-label="Back to messages" className="chat-back-link" href="/chats">
+                  <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                    <path d="m15 18-6-6 6-6" />
+                  </svg>
+                  Messages
+                </Link>
+                <div className="chat-compose-menu">
+                  <button
+                    aria-expanded={isCreateMenuOpen}
+                    aria-label="New chat"
+                    className="chat-compose-button"
+                    onClick={() => setIsCreateMenuOpen((isOpen) => !isOpen)}
+                    type="button"
+                  >
+                    <svg aria-hidden="true" focusable="false" viewBox="0 0 24 24">
+                      <path d="M12 5v14" />
+                      <path d="M5 12h14" />
+                    </svg>
+                  </button>
+                  {isCreateMenuOpen ? (
+                    <div className="chat-compose-popover">
+                      <button
+                        onClick={() => {
+                          setCreateMode("DIRECT");
+                          setIsCreateMenuOpen(false);
+                        }}
+                        type="button"
+                      >
+                        Direct message
+                      </button>
+                      <button
+                        onClick={() => {
+                          setCreateMode("GROUP");
+                          setIsCreateMenuOpen(false);
+                        }}
+                        type="button"
+                      >
+                        Project group
+                      </button>
+                    </div>
+                  ) : null}
+                </div>
+              </div>
               <div>
                 <span className={selectedConversation.type === "GROUP" ? "chat-avatar group" : "chat-avatar"}>
                   {getInitials(selectedConversation.title) || "C"}

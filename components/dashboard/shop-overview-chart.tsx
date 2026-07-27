@@ -1,3 +1,4 @@
+import { ShopHealthSwitcher, type DepartmentSummary } from "@/components/dashboard/shop-health-switcher";
 import type { listDashboardProjectStatuses } from "@/lib/db/projects";
 
 type DashboardProject = Awaited<ReturnType<typeof listDashboardProjectStatuses>>[number];
@@ -110,7 +111,7 @@ function formatHours(minutes: number) {
 }
 
 export function ShopOverviewChart({ projects, departments }: { projects: DashboardProject[]; departments: WorkflowDepartment[] }) {
-  const departmentSummaries = departments.map((department) => {
+  const departmentSummaries: DepartmentSummary[] = departments.map((department) => {
     const healthCounts = projects.reduce(
       (counts, project) => {
         const health = getProjectDepartmentHealth(project, department.workflowKey, departments);
@@ -132,9 +133,13 @@ export function ShopOverviewChart({ projects, departments }: { projects: Dashboa
     const total = Math.max(projects.length, 1);
 
     return {
-      ...department,
+      id: department.id,
+      name: department.name,
+      workflowKey: department.workflowKey,
       completePercent: Math.round((healthCounts.complete / total) * 100),
+      completeCount: healthCounts.complete,
       dominantHealth,
+      loggedMinutes,
       loggedHours: formatHours(loggedMinutes),
       needsEffortCount: healthCounts["needs-effort"],
       upcomingCount: healthCounts.upcoming
@@ -151,42 +156,5 @@ export function ShopOverviewChart({ projects, departments }: { projects: Dashboa
         ) / 10;
   const activePressure = departmentSummaries.reduce((total, department) => total + department.needsEffortCount, 0);
 
-  return (
-    <section className="card shop-overview-card">
-      <div className="section-heading-row">
-        <div>
-          <p className="eyebrow">Shop health</p>
-          <h2>Overall project flow</h2>
-          <p className="muted">A combined view of how all active cabinet jobs are moving through the shop.</p>
-        </div>
-        <div className="shop-health-score">
-          <span className="muted">Flow score</span>
-          <strong>{healthScore}%</strong>
-        </div>
-      </div>
-
-      <div className="shop-overview-meta">
-        <span>{projects.length} active projects</span>
-        <span>{activePressure} department checkpoints need effort</span>
-      </div>
-
-      <ol className="shop-overview-flow" aria-label="Combined project health by department">
-        {departmentSummaries.map((department, index) => {
-          const previousDepartment = departmentSummaries[index - 1];
-          const connectorClass = previousDepartment?.dominantHealth === "complete" ? "from-complete" : "";
-
-          return (
-            <li className={`shop-overview-step ${department.dominantHealth} ${connectorClass}`} key={department.id}>
-              <div className="shop-overview-node">
-                <span>{department.completePercent}%</span>
-              </div>
-              <strong>{department.name}</strong>
-              <small>{department.loggedHours}</small>
-              <small>{department.needsEffortCount} active</small>
-            </li>
-          );
-        })}
-      </ol>
-    </section>
-  );
+  return <ShopHealthSwitcher activePressure={activePressure} departments={departmentSummaries} healthScore={healthScore} projectCount={projects.length} />;
 }
