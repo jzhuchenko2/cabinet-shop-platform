@@ -55,7 +55,24 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
             <span className="brand-subtitle">Cabinetry OS</span>
           </span>
         </Link>
-        <nav className="sidebar-nav" aria-label="Main navigation">
+        <details className="mobile-nav-menu">
+          <summary aria-label="Open main navigation">
+            <span className="hamburger-lines" aria-hidden="true">
+              <i />
+              <i />
+              <i />
+            </span>
+            <span>Menu</span>
+          </summary>
+          <nav className="mobile-nav-links" aria-label="Main navigation">
+            {navItems.map((item) => (
+              <Link href={item.href} key={item.href}>
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </details>
+        <nav className="sidebar-nav desktop-sidebar-nav" aria-label="Main navigation">
           {navItems.map((item) => (
             <Link href={item.href} key={item.href}>
               {item.label}
@@ -67,7 +84,6 @@ export function AppShell({ children, user }: { children: React.ReactNode; user: 
             {utilityNavItems.map((item) => (
               <Link aria-label={item.label} className="utility-nav-link" href={item.href} key={item.href} title={item.label}>
                 <UtilityIcon icon={item.icon} />
-                <span>{item.label}</span>
               </Link>
             ))}
           </nav>
