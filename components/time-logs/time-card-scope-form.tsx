@@ -9,7 +9,7 @@ function SaveScopeButton() {
 
   return (
     <button className="button secondary" disabled={pending} type="submit">
-      {pending ? "Saving..." : "Save scope"}
+      {pending ? "Saving..." : "Save"}
     </button>
   );
 }
@@ -48,13 +48,13 @@ export function TimeCardScopeForm({
     <form action={action} className="time-card-scope-form">
       <input name="entryId" type="hidden" value={entryId} />
       <select
-        aria-label="Project worked on"
+        aria-label="Project"
         name="projectId"
         onChange={(event) => setSelectedProjectId(event.target.value)}
         required
         value={selectedProjectId}
       >
-        <option value="">Select project</option>
+        <option value="">Choose project</option>
         {projectOptions.map((project) => (
           <option key={project.id} value={project.id}>
             {project.name} - {project.client}
@@ -62,20 +62,20 @@ export function TimeCardScopeForm({
         ))}
       </select>
       <select
-        aria-label="Task worked on"
+        aria-label="Task"
         name="taskId"
         onChange={(event) => setSelectedTaskId(event.target.value)}
         required
         value={selectedTaskId}
       >
-        <option value="">{selectedProjectId ? "Select task" : "Select project first"}</option>
+        <option value="">{selectedProjectId ? "Choose task" : "Choose project first"}</option>
         {filteredTaskOptions.map((task) => (
           <option key={task.id} value={task.id}>
             {task.title}
           </option>
         ))}
       </select>
-      <input name="notes" placeholder="Work notes" defaultValue={notes} />
+      <input aria-label="Notes (optional)" name="notes" placeholder="Notes (optional)" defaultValue={notes} />
       <SaveScopeButton />
     </form>
   );

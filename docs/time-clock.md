@@ -14,4 +14,22 @@ The live time clock uses `TimeClockEntry` records.
 - When the worker clocks out, a completed labor entry is written to `TimeLog` with project, task, department, minutes, work date, and notes.
 - Project time pages summarize total logged time and show each entry's task and notes so managers can see how much time was spent and what work was done.
 
-Future proximity verification should attach to the clock entry instead of collecting background location. Good candidates are shop Wi-Fi validation, a QR/NFC station, or a coarse geofence confirmation.
+## Worker-facing wording
+
+Keep the clock focused on its status, project/task, and the **Clock in** or
+**Clock out** action. Hide missing clock dates and omit the link back to time
+cards when the worker is already on that page. Use short labels such as
+**Project**, **Task**, **Notes (optional)**, and **Save** instead of "work scope"
+or technical explanations.
+
+The clock-out review keeps shift/day/week totals and one instruction: "Choose a
+project and task to clock out." Both fields remain required and notes remain
+optional. Managers see the same requirement beside a disabled clock-out button
+when a card is missing its saved project or task.
+
+The summary uses **Clocked in**, **Recent shifts**, and **Project entries**;
+project entry counts remain separate from hours. Detail tabs use **Clocked in**,
+**Recent shifts**, and **Project time**. The dashboard clock omits implementation
+details such as verification method and automatic refresh explanations.
+
+Future proximity verification should attach to the clock entry instead of collecting background location. Good candidates are shop Wi-Fi validation, a QR/NFC station, or a coarse geofence confirmation. Keep this planning detail in documentation rather than worker-facing screens.

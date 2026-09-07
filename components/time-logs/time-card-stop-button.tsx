@@ -7,16 +7,19 @@ function StopButton() {
 
   return (
     <button className="button" disabled={pending} type="submit">
-      {pending ? "Stopping..." : "Clock out"}
+      {pending ? "Saving..." : "Clock out"}
     </button>
   );
 }
 
 function DisabledStopButton() {
   return (
-    <button className="button" disabled title="Select a project and task before clocking out." type="button">
-      Add scope first
-    </button>
+    <div>
+      <button className="button" disabled type="button">
+        Clock out
+      </button>
+      <small className="muted time-card-stop-hint">Choose a project and task, then save.</small>
+    </div>
   );
 }
 

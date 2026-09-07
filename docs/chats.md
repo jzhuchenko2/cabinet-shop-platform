@@ -11,6 +11,20 @@ The chat MVP gives every signed-in shop user access to `/chats`.
 - Message notifications are stored as `Notification` rows with type `CHAT_MESSAGE`.
 - The chat workspace refreshes every five seconds while the browser tab is visible.
 
+## Appearance
+
+Chats uses the shared palette from `app/globals.css`: orange actions, unread
+badges, and outgoing messages; charcoal avatars; warm neutral panels and
+incoming messages; and the platform's standard border and muted text colors.
+Orange surfaces use dark text and icons for readability. Selected conversations
+have a soft orange background and an orange edge, and keyboard focus uses the
+shared orange focus ring. The primary button hover color is shared with other
+pages through `--accent-hover`.
+
+The conversation header uses the available thread width so names do not get
+truncated into a narrow column. Desktop columns can shrink for smaller screens,
+while the existing single-pane mobile layout is preserved.
+
 ## Permissions
 
 All active shop roles receive the `view_chats` permission. Settings remain manager-only through `view_settings`.
