@@ -24,6 +24,13 @@ Project PDF files are stored in Supabase Storage using the `SUPABASE_PROJECT_FIL
 
 The calendar combines automatic project/task dates with manual calendar events. Project due dates, install dates, and task due dates are derived from Prisma project/task records for every signed-in role with calendar access. Manual `CalendarEvent` records support personal or company visibility, optional project association, event type, notes, color, and start/end times. Owners/admins and managers can create or edit company events and customize colors; non-manager roles can create and edit their own personal events while still viewing company and project-based schedule layers.
 
+`CalendarEvent` is a server-only database table. Its security migration enables
+RLS without client policies and revokes public/client table privileges to block
+direct Supabase Data API access. Prisma uses a trusted server database role;
+application code remains responsible for organization and event permissions.
+See [deployment instructions](deployment.md#calendarevent-rls-warning) for the
+required database role and verification queries.
+
 Manager settings use the persisted `Department` records as the source of truth for the shop workflow. Departments now carry active/hidden state, sort order, display name, workflow key, and an optional deadline label. Dashboard flow charts, task department options, and new project setup read active departments from the database so workflow changes apply across the app without code changes.
 
 ## Early Data Model Direction

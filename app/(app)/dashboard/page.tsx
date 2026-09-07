@@ -86,8 +86,7 @@ export default async function DashboardPage() {
           department: entry.user.department?.name ?? "Unassigned",
           project: entry.project?.name ?? "General shop time",
           task: entry.task?.title ?? "No task selected",
-          startedAt: entry.startedAt.toISOString(),
-          verification: entry.source === "MANUAL" ? "Manual clock-in" : entry.source
+          startedAt: entry.startedAt.toISOString()
         }))}
       />
 

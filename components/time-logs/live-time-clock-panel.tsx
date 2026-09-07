@@ -10,7 +10,6 @@ export type LiveTimeClockRow = {
   project: string;
   task: string;
   startedAt: string;
-  verification: string;
 };
 
 function formatStartedAt(value: string) {
@@ -72,8 +71,8 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
     >
       <div className="live-clock-compact-main">
         <div>
-          <p className="eyebrow">Live time clock</p>
-          <h2>{entries.length} workers clocked in</h2>
+          <p className="eyebrow">Time clock</p>
+          <h2>{entries.length} clocked in</h2>
         </div>
         <span className={entries.length > 0 ? "live-clock-pulse active" : "live-clock-pulse"} />
       </div>
@@ -87,10 +86,8 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
           ))}
           {activeEntries.length > 6 ? <span>+{activeEntries.length - 6} more</span> : null}
         </div>
-      ) : (
-        <p className="muted">No workers are clocked in right now.</p>
-      )}
-      <p className="muted">Click for details.</p>
+      ) : null}
+      <p className="muted">View details</p>
 
       {isOpen ? (
         <div
@@ -110,9 +107,8 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
           >
             <div className="section-heading-row">
               <div>
-                <p className="eyebrow">Live time clock</p>
-                <h2 id="live-clock-details-title">{entries.length} workers clocked in</h2>
-                <p className="muted">Updates automatically while this dashboard is open.</p>
+                <p className="eyebrow">Time clock</p>
+                <h2 id="live-clock-details-title">{entries.length} clocked in</h2>
               </div>
               <div className="header-actions">
                 <button className="button secondary" onClick={() => router.refresh()} type="button">
@@ -140,8 +136,7 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
                     <th>Project</th>
                     <th>Task</th>
                     <th>Clocked in</th>
-                    <th>Elapsed</th>
-                    <th>Verification</th>
+                    <th>Time worked</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -152,14 +147,13 @@ export function LiveTimeClockPanel({ entries }: { entries: LiveTimeClockRow[] })
                       <td data-label="Project">{entry.project}</td>
                       <td data-label="Task">{entry.task}</td>
                       <td data-label="Clocked in">{entry.startedAtLabel}</td>
-                      <td data-label="Elapsed">{entry.elapsed}</td>
-                      <td data-label="Verification">{entry.verification}</td>
+                      <td data-label="Time worked">{entry.elapsed}</td>
                     </tr>
                   ))}
                 </tbody>
               </table>
             ) : (
-              <p className="muted">No workers are clocked in right now.</p>
+              <p className="muted">No one is clocked in.</p>
             )}
           </div>
         </div>

@@ -40,9 +40,9 @@ export type ProjectTimeLogRow = {
 type TabKey = "live" | "completed" | "logs";
 
 const tabs: { key: TabKey; label: string }[] = [
-  { key: "live", label: "Live" },
-  { key: "completed", label: "Completed" },
-  { key: "logs", label: "Project logs" }
+  { key: "live", label: "Clocked in" },
+  { key: "completed", label: "Recent shifts" },
+  { key: "logs", label: "Project time" }
 ];
 
 export function TimeCardWorkspaceModal({
@@ -76,26 +76,24 @@ export function TimeCardWorkspaceModal({
     <section className="card time-card-hub">
       <div className="section-heading-row">
         <div>
-          <p className="eyebrow">Time card activity</p>
-          <h2>Timesheet details</h2>
-          <p className="muted">Live cards, completed clock sessions, and project logs are grouped together.</p>
+          <h2>Time summary</h2>
         </div>
         <button className="button" onClick={() => setIsOpen(true)} type="button">
-          Open details
+          View details
         </button>
       </div>
 
       <div className="time-card-hub-grid">
         <div>
-          <span className="muted">Live</span>
+          <span className="muted">Clocked in</span>
           <strong>{activeEntries.length}</strong>
         </div>
         <div>
-          <span className="muted">Completed</span>
+          <span className="muted">Recent shifts</span>
           <strong>{completedEntries.length}</strong>
         </div>
         <div>
-          <span className="muted">Project logs</span>
+          <span className="muted">Project entries</span>
           <strong>{timeLogs.length}</strong>
           <small>{Math.round((loggedTotal / 60) * 10) / 10}h</small>
         </div>
@@ -106,8 +104,7 @@ export function TimeCardWorkspaceModal({
           <div aria-labelledby="time-card-details-title" aria-modal="true" className="modal-panel wide" role="dialog">
             <div className="section-heading-row">
               <div>
-                <p className="eyebrow">Labor</p>
-                <h2 id="time-card-details-title">Time card details</h2>
+                <h2 id="time-card-details-title">Time cards</h2>
               </div>
               <button
                 aria-label="Close time card details"
@@ -145,9 +142,9 @@ export function TimeCardWorkspaceModal({
                       <tr>
                         <th>Employee</th>
                         <th>Started</th>
-                        <th>Elapsed</th>
-                        <th>Work scope</th>
-                        <th>Manage</th>
+                        <th>Time worked</th>
+                        <th>Project &amp; task</th>
+                        {canManageTimeCards ? <th>Actions</th> : null}
                       </tr>
                     </thead>
                     <tbody>
@@ -155,8 +152,8 @@ export function TimeCardWorkspaceModal({
                         <tr key={entry.id}>
                           <td data-label="Employee">{entry.employee}</td>
                           <td data-label="Started">{entry.startedAt}</td>
-                          <td data-label="Elapsed">{entry.elapsed}</td>
-                          <td data-label="Work scope">
+                          <td data-label="Time worked">{entry.elapsed}</td>
+                          <td data-label="Project & task">
                             <TimeCardScopeForm
                               action={updateScopeAction}
                               entryId={entry.id}
@@ -167,17 +164,17 @@ export function TimeCardWorkspaceModal({
                               taskOptions={taskOptions}
                             />
                           </td>
-                          <td data-label="Manage">
-                            {canManageTimeCards ? (
+                          {canManageTimeCards ? (
+                            <td data-label="Actions">
                               <TimeCardStopButton action={stopAction} canStop={Boolean(entry.projectId && entry.taskId)} entryId={entry.id} />
-                            ) : null}
-                          </td>
+                            </td>
+                          ) : null}
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="muted empty-state">No one is clocked in right now.</p>
+                  <p className="muted empty-state">{canManageTimeCards ? "No one is clocked in." : "You're clocked out."}</p>
                 )}
               </div>
             ) : null}
@@ -210,7 +207,7 @@ export function TimeCardWorkspaceModal({
                     </tbody>
                   </table>
                 ) : (
-                  <p className="muted empty-state">No completed clock sessions yet.</p>
+                  <p className="muted empty-state">No finished shifts yet.</p>
                 )}
               </div>
             ) : null}
@@ -225,7 +222,7 @@ export function TimeCardWorkspaceModal({
                         <th>Project</th>
                         <th>Task</th>
                         <th>Total</th>
-                        <th>Work date</th>
+                        <th>Date</th>
                         <th>Notes</th>
                       </tr>
                     </thead>
@@ -236,14 +233,14 @@ export function TimeCardWorkspaceModal({
                           <td data-label="Project">{log.project}</td>
                           <td data-label="Task">{log.task}</td>
                           <td data-label="Total">{log.total}</td>
-                          <td data-label="Work date">{log.workDate}</td>
+                          <td data-label="Date">{log.workDate}</td>
                           <td data-label="Notes">{log.notes}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                 ) : (
-                  <p className="muted empty-state">No project time logs have been recorded yet.</p>
+                  <p className="muted empty-state">No project time recorded yet.</p>
                 )}
               </div>
             ) : null}

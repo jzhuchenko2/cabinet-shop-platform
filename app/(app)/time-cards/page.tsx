@@ -99,13 +99,7 @@ export default async function TimeCardsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Labor"
         title={isFullAccess(currentUser) ? "Time cards" : "My time card"}
-        description={
-          canManageTimeCards
-            ? "Live clock-ins, project/task work scope, and completed employee time logs."
-            : "Your clock-ins, project/task selections, and completed time log history."
-        }
       />
 
       {!canManageTimeCards ? (
@@ -127,6 +121,7 @@ export default async function TimeCardsPage() {
           clockOutAction={clockOutAction}
           lastClockedOutAt={userClockState.lastEntry?.endedAt?.toISOString() ?? null}
           projectOptions={projectOptions}
+          showTimeCardsLink={false}
           taskOptions={taskOptions}
           todayLoggedMinutes={userClockState.todayLoggedMinutes}
           userName={currentUser.name}
